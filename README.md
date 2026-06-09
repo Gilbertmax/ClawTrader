@@ -33,33 +33,39 @@
 
 ### 📋 Requisitos
 
-- **Node.js** ≥ v18 (para OpenClaw)
-- **OpenClaw** (`curl -fsSL https://openclaw.ai/install.sh | bash`)
 - **Python 3.9+** con pip
+- **OpenClaw instalado y configurado**. ClawTrader se instala dentro de `~/.openclaw/skills` y `~/.openclaw/workspace`.
 - **Cuenta en Binance** con API habilitada (opcional: Alpaca)
 - **Bot de Telegram** (opcional)
 
 ### 🔧 Instalación
 
+Primero instala OpenClaw. ClawTrader no reemplaza OpenClaw: agrega sus skills y tools al workspace de OpenClaw.
+
 ```bash
-# 1. Clonar el repositorio
-git clone https://github.com/tu-usuario/ClawTrader.git
-cd ClawTrader
-
-# 2. Crear y activar entorno virtual
-python3 -m venv venv
-source venv/bin/activate
-
-# 3. Instalar dependencias
-pip install -r requirements.txt
-
-# 4. Instalar OpenClaw
+# 1. Instalar OpenClaw
 curl -fsSL https://openclaw.ai/install.sh | bash
 openclaw --version
 
-# 5. Ejecutar instalador interactivo
+# Si openclaw no aparece después de instalar:
+export PATH="$HOME/.npm-global/bin:$PATH"
+
+# 2. Clonar ClawTrader
+git clone https://github.com/tu-usuario/ClawTrader.git
+cd ClawTrader
+
+# 3. Crear y activar entorno virtual
+python3 -m venv venv
+source venv/bin/activate
+
+# 4. Instalar dependencias de ClawTrader
+pip install -r requirements.txt
+
+# 5. Desplegar ClawTrader dentro de OpenClaw
 python3 install.py
 ```
+
+El instalador valida OpenClaw antes de pedir credenciales. Si OpenClaw no existe, se detiene con instrucciones.
 
 > 💡 **¿No tienes cuenta en Binance?** [¡Crea una aquí!](https://www.binance.com/referral/earn-together/refer2earn-usdc/claim?hl=es-LA&ref=GRO_28502_BYDAT&utm_source=referral_entrance)
 
@@ -185,33 +191,39 @@ El trading conlleva riesgo de pérdida de capital.
 
 ### 📋 Requirements
 
-- **Node.js** ≥ v18 (for OpenClaw)
-- **OpenClaw** (`curl -fsSL https://openclaw.ai/install.sh | bash`)
 - **Python 3.9+** with pip
+- **OpenClaw installed and configured**. ClawTrader installs into `~/.openclaw/skills` and `~/.openclaw/workspace`.
 - **Binance account** with API enabled (optional: Alpaca)
 - **Telegram Bot** (optional)
 
 ### 🔧 Installation
 
+Install OpenClaw first. ClawTrader does not replace OpenClaw: it adds its skills and tools to the OpenClaw workspace.
+
 ```bash
-# 1. Clone the repository
-git clone https://github.com/your-user/ClawTrader.git
-cd ClawTrader
-
-# 2. Create and activate virtual environment
-python3 -m venv venv
-source venv/bin/activate
-
-# 3. Install dependencies
-pip install -r requirements.txt
-
-# 4. Install OpenClaw
+# 1. Install OpenClaw
 curl -fsSL https://openclaw.ai/install.sh | bash
 openclaw --version
 
-# 5. Run interactive installer
+# If openclaw is not found after installation:
+export PATH="$HOME/.npm-global/bin:$PATH"
+
+# 2. Clone ClawTrader
+git clone https://github.com/your-user/ClawTrader.git
+cd ClawTrader
+
+# 3. Create and activate virtual environment
+python3 -m venv venv
+source venv/bin/activate
+
+# 4. Install ClawTrader dependencies
+pip install -r requirements.txt
+
+# 5. Deploy ClawTrader into OpenClaw
 python3 install.py
 ```
+
+The installer validates OpenClaw before asking for credentials. If OpenClaw is missing, it stops with instructions.
 
 > 💡 **Don't have a Binance account yet?** [Create one here with my referral link!](https://www.binance.com/referral/earn-together/refer2earn-usdc/claim?hl=es-LA&ref=GRO_28502_BYDAT&utm_source=referral_entrance)
 
