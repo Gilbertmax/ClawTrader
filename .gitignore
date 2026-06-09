@@ -1,0 +1,40 @@
+# ClawTrader — .gitignore
+# Protege credenciales, datos locales y archivos temporales
+
+# Credenciales y API keys
+.env
+**/keys_b64.json
+**/keys.json
+**/credentials.json
+**/alpaca_demo.json
+
+# Datos de trading
+data/
+**/monitor-snapshots/
+**/snapshots/
+**/market-data/
+**/snapshot_*.json
+**/market-snapshot.json
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+
+# Node / OpenClaw
+node_modules/
+.openclaw/
+
+# OS
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+*.log
+
+# Temp
+/tmp/
