@@ -13,7 +13,7 @@
 
 ## ES — 🇪🇸 Español
 
-> ClawTrader es un asistente de trading open source para escaneo de mercado, gestión de riesgo, bitácora y flujos controlados de paper/live trading. El trading real está desactivado por defecto.
+> ClawTrader es un asistente de trading open source para analizar mercados, gestionar riesgo y ejecutar flujos de paper/live trading con control, disciplina y transparencia.
 
 ---
 
@@ -159,7 +159,7 @@ El trading conlleva riesgo de pérdida de capital.
 
 ## EN — 🇬🇧 English
 
-> ClawTrader is an open-source trading assistant for market scanning, risk management, journaling, and controlled paper/live trading workflows. Live trading is disabled by default.
+> ClawTrader is an open-source trading assistant for market analysis, risk management, and controlled paper/live trading workflows built around discipline and transparency.
 
 ### 🚀 Key Features
 
