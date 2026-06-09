@@ -103,6 +103,8 @@ openclaw --version
 
 ## Paso 6: Ejecutar el instalador interactivo
 
+El instalador valida `openclaw --version` al inicio. Si OpenClaw no está instalado o no está en `PATH`, fallará antes de pedir credenciales.
+
 ```bash
 python3 install.py
 ```
@@ -181,8 +183,8 @@ ls tools/*.py | wc -l
 # 4. Verificar skills
 ls skills/es/ | head -5
 
-# 5. Probar conexión a Binance
-python3 -c "from tools.crypto_live import *; print('Binance OK')"
+# 5. Probar conexión pública a Binance
+python3 tools/clawtrader.py snapshot --exchanges binance --symbols BTC/USDT
 
 # 6. Verificar OpenClaw
 openclaw --version

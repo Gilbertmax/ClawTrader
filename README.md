@@ -53,11 +53,12 @@ source venv/bin/activate
 # 3. Instalar dependencias
 pip install -r requirements.txt
 
-# 4. Ejecutar instalador interactivo
-python3 install.py
-
-# 5. Asegurar que OpenClaw esté instalado
+# 4. Instalar OpenClaw
 npm install -g openclaw
+openclaw --version
+
+# 5. Ejecutar instalador interactivo
+python3 install.py
 ```
 
 > 💡 **¿No tienes cuenta en Binance?** [¡Crea una aquí!](https://www.binance.com/referral/earn-together/refer2earn-usdc/claim?hl=es-LA&ref=GRO_28502_BYDAT&utm_source=referral_entrance)
@@ -87,14 +88,17 @@ npm install -g openclaw
 openclaw
 
 # Ejecutar scanner de mercado manualmente
-python3 tools/market_scanner.py
+python3 tools/clawtrader.py scan
 
-# Iniciar monitoreo autónomo
-python3 tools/autonomous_monitor.py
+# Ver snapshot crypto en vivo
+python3 tools/clawtrader.py snapshot --exchanges binance
 
 # Ver dashboard de trading
-python3 tools/server.py
+python3 tools/clawtrader.py dashboard
 # Luego abre http://localhost:8080
+
+# Validar instalación
+python3 tools/clawtrader.py health
 ```
 
 O simplemente habla con ClawTrader en Telegram para recibir señales y gestionar operaciones.
@@ -110,6 +114,10 @@ ClawTrader/
 ├── .env.example           # Ejemplo de variables de entorno
 │
 ├── tools/                 # Scripts de trading
+│   ├── clawtrader.py          # CLI unificada
+│   ├── config.py              # Configuración segura
+│   ├── risk.py                # Validación de riesgo
+│   ├── binance_client.py      # Cliente Binance REST
 │   ├── market_scanner.py      # Scanner de mercados
 │   ├── alpaca_trader.py       # Interfaz Alpaca
 │   ├── autonomous_monitor.py  # Monitoreo autónomo
@@ -197,11 +205,12 @@ source venv/bin/activate
 # 3. Install dependencies
 pip install -r requirements.txt
 
-# 4. Run interactive installer
-python3 install.py
-
-# 5. Make sure OpenClaw is installed
+# 4. Install OpenClaw
 npm install -g openclaw
+openclaw --version
+
+# 5. Run interactive installer
+python3 install.py
 ```
 
 > 💡 **Don't have a Binance account yet?** [Create one here with my referral link!](https://www.binance.com/referral/earn-together/refer2earn-usdc/claim?hl=es-LA&ref=GRO_28502_BYDAT&utm_source=referral_entrance)
@@ -231,14 +240,17 @@ npm install -g openclaw
 openclaw
 
 # Run market scanner manually
-python3 tools/market_scanner.py
+python3 tools/clawtrader.py scan
 
-# Start autonomous monitoring
-python3 tools/autonomous_monitor.py
+# View live crypto snapshot
+python3 tools/clawtrader.py snapshot --exchanges binance
 
 # View trading dashboard
-python3 tools/server.py
+python3 tools/clawtrader.py dashboard
 # Then open http://localhost:8080
+
+# Verify installation
+python3 tools/clawtrader.py health
 ```
 
 Or just talk to ClawTrader on Telegram to receive signals and manage trades.
@@ -254,6 +266,10 @@ ClawTrader/
 ├── .env.example           # Environment variables example
 │
 ├── tools/                 # Trading scripts
+│   ├── clawtrader.py          # Unified CLI
+│   ├── config.py              # Safe configuration
+│   ├── risk.py                # Risk validation
+│   ├── binance_client.py      # Binance REST client
 │   ├── market_scanner.py      # Market scanner
 │   ├── alpaca_trader.py       # Alpaca interface
 │   ├── autonomous_monitor.py  # Autonomous monitor

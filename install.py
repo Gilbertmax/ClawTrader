@@ -27,6 +27,22 @@ MSGS = {
         "step_deploy":   "📁 PASO 2 — Despliegue de archivos",
         "step_crons":    "⏰ PASO 3 — Programación de monitoreo",
         "step_finish":   "✅ PASO 4 — Finalización",
+        "openclaw_ok":   "✅ OpenClaw detectado: {version}",
+        "openclaw_missing": """
+❌ OpenClaw no está instalado o no está disponible en PATH.
+
+ClawTrader instala skills y tools dentro de OpenClaw, así que primero necesitas instalar OpenClaw:
+
+   npm install -g openclaw
+
+Después verifica:
+
+   openclaw --version
+
+Cuando eso funcione, vuelve a ejecutar:
+
+   python3 install.py
+""",
         "select_binance":"¿Operarás en Binance? (s/N): ",
         "select_alpaca": "¿Operarás en Alpaca Paper Trading? (s/N): ",
         "select_tg":     "¿Configurar notificaciones por Telegram? (s/N): ",
@@ -44,8 +60,7 @@ MSGS = {
 
 📌  Próximos pasos:
 
-1. Asegúrate de tener OpenClaw instalado:
-   npm install -g openclaw
+1. OpenClaw ya fue verificado por el instalador.
 
 2. El workspace ya está configurado en:
    ~/.openclaw/workspace/
@@ -71,6 +86,22 @@ MSGS = {
         "step_deploy":   "📁 STEP 2 — File Deployment",
         "step_crons":    "⏰ STEP 3 — Monitoring Schedule",
         "step_finish":   "✅ STEP 4 — Finish",
+        "openclaw_ok":   "✅ OpenClaw detected: {version}",
+        "openclaw_missing": """
+❌ OpenClaw is not installed or is not available in PATH.
+
+ClawTrader installs skills and tools inside OpenClaw, so you need to install OpenClaw first:
+
+   npm install -g openclaw
+
+Then verify:
+
+   openclaw --version
+
+When that works, run again:
+
+   python3 install.py
+""",
         "select_binance":"Will you trade on Binance? (y/N): ",
         "select_alpaca": "Will you trade on Alpaca Paper Trading? (y/N): ",
         "select_tg":     "Configure Telegram notifications? (y/N): ",
@@ -88,8 +119,7 @@ MSGS = {
 
 📌  Next steps:
 
-1. Make sure OpenClaw is installed:
-   npm install -g openclaw
+1. OpenClaw was verified by the installer.
 
 2. Workspace configured at:
    ~/.openclaw/workspace/
@@ -125,6 +155,27 @@ def prompt_yesno(msg, default="n", lang="es"):
             return False
         print("  Responde s/n o y/n")
 
+def ensure_openclaw(lang):
+    exe = shutil.which("openclaw")
+    if not exe:
+        print(MSGS[lang]["openclaw_missing"])
+        raise SystemExit(1)
+
+    try:
+        import subprocess
+        result = subprocess.run(
+            [exe, "--version"],
+            capture_output=True,
+            text=True,
+            timeout=10,
+            check=False,
+        )
+        version = (result.stdout or result.stderr or exe).strip().splitlines()[0]
+    except Exception:
+        version = exe
+
+    print(say("openclaw_ok", lang, version=version))
+
 def main():
     # ─── Idioma ───
     lang = input(MSGS["es"]["lang_prompt"]).strip().lower()
@@ -136,6 +187,7 @@ def main():
     print(f"{'='*60}\n")
     print(say("welcome_msg", lang))
     print()
+    ensure_openclaw(lang)
 
     # ─── PASO 1: Keys ───
     print(f"\n--- {say('step_keys', lang)} ---\n")

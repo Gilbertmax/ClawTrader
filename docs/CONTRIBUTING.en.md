@@ -77,8 +77,8 @@ Before sending a PR:
 
 ```bash
 python3 -m compileall -q install.py tools
-python3 tools/healthcheck.py
-python3 tools/market_scanner.py
+python3 tools/clawtrader.py health
+python3 tools/clawtrader.py scan --symbols BTCUSDT ETHUSDT
 ```
 
 To test installation without touching your real configuration:
@@ -91,7 +91,7 @@ HOME="$tmp" python3 install.py
 If you modify the dashboard:
 
 ```bash
-python3 tools/server.py --host 127.0.0.1 --port 8765
+python3 tools/clawtrader.py dashboard --host 127.0.0.1 --port 8765
 curl -s http://127.0.0.1:8765/health
 ```
 
@@ -156,7 +156,7 @@ Suggested template:
 
 ## Verification
 - [ ] python3 -m compileall -q install.py tools
-- [ ] python3 tools/healthcheck.py
+- [ ] python3 tools/clawtrader.py health
 - [ ] Installation tested in a temporary HOME
 ```
 
@@ -183,4 +183,3 @@ gilbertmax
 ## License
 
 By contributing, you agree that your changes will be published under the project's MIT License.
-

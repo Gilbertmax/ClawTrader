@@ -20,17 +20,17 @@ Solo habla con tu bot de ClawTrader en Telegram. Puedes:
 ### 2. Por línea de comandos
 ```bash
 # Ejecutar el scanner de mercado
-python3 tools/market_scanner.py
+python3 tools/clawtrader.py scan
 
-# Monitoreo autónomo (procesa señales automáticamente)
-python3 tools/autonomous_monitor.py
+# Ver snapshot crypto en vivo
+python3 tools/clawtrader.py snapshot --exchanges binance
 
 # Ver dashboard web
-python3 tools/server.py
+python3 tools/clawtrader.py dashboard
 # Abre http://localhost:8080 en tu navegador
 
-# Ejecutar orquestador
-python3 tools/orchestrator.py
+# Validar instalación
+python3 tools/clawtrader.py health
 ```
 
 ### 3. Desde OpenClaw
@@ -163,7 +163,7 @@ El dashboard web (puerto 8080) te permite ver:
 
 ```bash
 # Iniciar dashboard
-python3 tools/server.py
+python3 tools/clawtrader.py dashboard
 # Abrir: http://localhost:8080
 ```
 
@@ -173,11 +173,14 @@ python3 tools/server.py
 
 ```bash
 # Verificar conexión a Binance
-python3 -c "from tools.crypto_live import *; print(get_binance_ticker('BTCUSDT'))"
+python3 tools/clawtrader.py snapshot --exchanges binance --symbols BTC/USDT
 
 # Ejecutar análisis rápido
-python3 tools/trading_analytics.py BTC/USDT 1h
+python3 tools/clawtrader.py analyze BTC-USD --period 5d --interval 1h
+
+# Validar riesgo de una propuesta
+python3 tools/clawtrader.py risk --entry 100 --current 101 --stop 97 --take-profit 106 --score 7 --amount 300
 
 # Verificar estado del sistema
-ls -la ~/.openclaw/workspace/.env && echo "✅ .env OK" || echo "❌ .env no encontrado"
+python3 tools/clawtrader.py health
 ```

@@ -30,6 +30,18 @@ fi
 echo "🌐 Idioma: $([ "$LANG" = "es" ] && echo "Español" || echo "English")"
 echo ""
 
+if ! command -v openclaw >/dev/null 2>&1; then
+    echo "❌ OpenClaw no está instalado o no está disponible en PATH."
+    echo "   Instala primero:"
+    echo "   npm install -g openclaw"
+    echo "   Luego verifica:"
+    echo "   openclaw --version"
+    exit 1
+fi
+
+echo "✅ OpenClaw detectado: $(openclaw --version 2>/dev/null | head -1)"
+echo ""
+
 # ─── Copiar tools ───
 echo "📁 Copiando tools..."
 TOOLS_SRC="$SCRIPT_DIR/tools"

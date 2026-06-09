@@ -20,17 +20,17 @@ Just talk to your ClawTrader bot on Telegram. You can:
 ### 2. Via command line
 ```bash
 # Run the market scanner
-python3 tools/market_scanner.py
+python3 tools/clawtrader.py scan
 
-# Autonomous monitoring (processes signals automatically)
-python3 tools/autonomous_monitor.py
+# View live crypto snapshot
+python3 tools/clawtrader.py snapshot --exchanges binance
 
 # View web dashboard
-python3 tools/server.py
+python3 tools/clawtrader.py dashboard
 # Open http://localhost:8080 in your browser
 
-# Run the orchestrator
-python3 tools/orchestrator.py
+# Verify installation
+python3 tools/clawtrader.py health
 ```
 
 ### 3. From OpenClaw
@@ -163,7 +163,7 @@ The web dashboard (port 8080) lets you view:
 
 ```bash
 # Start the dashboard
-python3 tools/server.py
+python3 tools/clawtrader.py dashboard
 # Open: http://localhost:8080
 ```
 
@@ -173,11 +173,14 @@ python3 tools/server.py
 
 ```bash
 # Test Binance connection
-python3 -c "from tools.crypto_live import *; print(get_binance_ticker('BTCUSDT'))"
+python3 tools/clawtrader.py snapshot --exchanges binance --symbols BTC/USDT
 
 # Quick analysis
-python3 tools/trading_analytics.py BTC/USDT 1h
+python3 tools/clawtrader.py analyze BTC-USD --period 5d --interval 1h
+
+# Validate a trade proposal
+python3 tools/clawtrader.py risk --entry 100 --current 101 --stop 97 --take-profit 106 --score 7 --amount 300
 
 # Check system status
-ls -la ~/.openclaw/workspace/.env && echo "✅ .env OK" || echo "❌ .env not found"
+python3 tools/clawtrader.py health
 ```

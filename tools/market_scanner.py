@@ -1,8 +1,14 @@
 #!/usr/bin/env python3
 from urllib.request import urlopen
 import json
+from datetime import datetime
 
-MIN_SCORE = 6
+MIN_SCORE = 7
+DEFAULT_PAIRS = [
+    "BTCUSDT", "ETHUSDT", "BNBUSDT", "SOLUSDT", "XRPUSDT",
+    "ADAUSDT", "DOGEUSDT", "LINKUSDT", "AVAXUSDT", "NEARUSDT",
+    "SUIUSDT", "FETUSDT", "ZECUSDT", "DASHUSDT", "WLDUSDT",
+]
 
 def k(sym, iv, lim=50):
     with urlopen(f"https://api.binance.com/api/v3/klines?symbol={sym}&interval={iv}&limit={lim}", timeout=10) as r:
@@ -66,20 +72,32 @@ def scan(sym):
     except Exception as e:
         return None
 
-pairs = ["BTCUSDT","ETHUSDT","BNBUSDT","SOLUSDT","XRPUSDT",
-         "ADAUSDT","DOGEUSDT","LINKUSDT","AVAXUSDT","NEARUSDT",
-         "SUIUSDT","FETUSDT","ZECUSDT","DASHUSDT","WLDUSDT"]
+def run_scan(pairs=None, min_score=MIN_SCORE):
+    pairs = pairs or DEFAULT_PAIRS
+    results = []
+    for p in pairs:
+        r = scan(p)
+        if r:
+            results.append(r)
+    results.sort(key=lambda x: x["sco"], reverse=True)
 
-results = []
-for p in pairs:
-    r = scan(p)
-    if r: results.append(r)
-results.sort(key=lambda x: x["sco"], reverse=True)
+    alerts = [r for r in results if r["sco"] >= min_score]
+    now = datetime.now().strftime("%H:%M")
 
-alerts = [r for r in results if r["sco"] >= MIN_SCORE]
-now = __import__("datetime").datetime.now().strftime("%H:%M")
+    return {
+        "t": now,
+        "n": len(results),
+        "alerts": len(alerts),
+        "scores": {r["s"]: r["sco"] for r in results[:10]},
+        "best": alerts[0] if alerts else (results[0] if results else None),
+        "results": results,
+    }
 
-out = {"t": now, "n": len(results), "alerts": len(alerts),
-       "scores": {r["s"]: r["sco"] for r in results[:10]},
-       "best": alerts[0] if alerts else results[0]}
-print(json.dumps(out))
+
+def main():
+    out = run_scan()
+    print(json.dumps(out))
+
+
+if __name__ == "__main__":
+    main()

@@ -189,17 +189,12 @@ def default_dashboard_html():
 </body>
 </html>"""
 
-def main():
-    parser = argparse.ArgumentParser(description='ClawTrader Dashboard Server')
-    parser.add_argument('--port', type=int, default=8080, help='Port (default: 8080)')
-    parser.add_argument('--host', default='0.0.0.0', help='Host (default: 0.0.0.0)')
-    args = parser.parse_args()
-    
-    server = http.server.HTTPServer((args.host, args.port), Handler)
+def serve(host="0.0.0.0", port=8080):
+    server = http.server.HTTPServer((host, port), Handler)
     print(f"""
 ╔══════════════════════════════════════════════════╗
 ║     📈 ClawTrader Dashboard Server              ║
-║     http://localhost:{args.port}                   ║
+║     http://localhost:{port}                   ║
 ║                                                  ║
 ║     Endpoints:                                   ║
 ║       /              Dashboard HTML              ║
@@ -214,6 +209,14 @@ def main():
     except KeyboardInterrupt:
         print("\n⏹️  Server stopped.")
         server.server_close()
+
+
+def main():
+    parser = argparse.ArgumentParser(description='ClawTrader Dashboard Server')
+    parser.add_argument('--port', type=int, default=8080, help='Port (default: 8080)')
+    parser.add_argument('--host', default='0.0.0.0', help='Host (default: 0.0.0.0)')
+    args = parser.parse_args()
+    serve(host=args.host, port=args.port)
 
 if __name__ == '__main__':
     main()
