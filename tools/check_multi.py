@@ -6,15 +6,18 @@ Corre cada 2 minutos via cron (clawtrader-check-aggressive).
 """
 import yfinance as yf, json, os
 from datetime import datetime
+from load_env import env_float, load_env, status_dir
+
+load_env()
 
 SYMBOLS = {
     "MSFT": {"name": "Microsoft", "active": True},
     "NVDA": {"name": "NVIDIA", "active": True}
 }
-CAPITAL = 100873.56
+CAPITAL = env_float("CLAWTRADER_CAPITAL", 1000)
 RISK_PCT = 0.005
 STOP_PCT = 0.0085
-STATUS_FILE = "/tmp/clawtrader_status.json"
+STATUS_FILE = status_dir() / "clawtrader_status.json"
 
 def get_rsi(series, period=14):
     delta = series.diff()
@@ -140,7 +143,7 @@ for sym, data in status["symbols"].items():
         break
 
 # Atomic write
-tmp = STATUS_FILE + ".tmp"
+tmp = os.fspath(STATUS_FILE) + ".tmp"
 with open(tmp, 'w') as f:
     json.dump(status, f, indent=2)
     f.flush()

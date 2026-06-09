@@ -6,6 +6,9 @@ Escribe estado en /tmp/clawtrader_crypto.json
 """
 import requests as r, json, os, hmac, hashlib, time
 from datetime import datetime
+from load_env import load_env, status_dir
+
+load_env()
 
 BINANCE_API = "https://api.binance.com"
 SYMBOLS = [
@@ -15,13 +18,15 @@ SYMBOLS = [
     {"sym": "BNBUSDT", "name": "BNB/USDT", "active": True, "min_qty": 0.001}
 ]
 RISK_PCT = 0.05  # 5% por trade en crypto (con $1.36)
-STATUS_FILE = "/tmp/clawtrader_crypto.json"
+STATUS_FILE = status_dir() / "clawtrader_crypto.json"
 
-API_KEY = "***"
-SECRET_KEY = "CsoZYU…1ThZ"
+API_KEY = os.environ.get("BINANCE_API_KEY", "NOT_SET")
+SECRET_KEY = os.environ.get("BINANCE_SECRET_KEY", "NOT_SET")
 HEADERS = {"X-MBX-APIKEY": API_KEY}
 
 def get_account_balance():
+    if API_KEY == "NOT_SET" or SECRET_KEY == "NOT_SET":
+        return {}
     params = {"timestamp": int(time.time() * 1000), "omitZeroBalances": "true"}
     query = "&".join(f"{k}={v}" for k, v in sorted(params.items()))
     sig = hmac.new(SECRET_KEY.encode(), query.encode(), hashlib.sha256).hexdigest()
@@ -161,10 +166,9 @@ else:
     print(f"\n⏳ Sin entrada. Esperando condiciones...", flush=True)
 
 # Atomic write
-tmp = STATUS_FILE + ".tmp"
+tmp = os.fspath(STATUS_FILE) + ".tmp"
 with open(tmp, 'w') as f:
     json.dump(results, f, indent=2)
     f.flush()
     os.fsync(f.fileno())
 os.rename(tmp, STATUS_FILE)
-PYEOF

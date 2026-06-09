@@ -5,21 +5,27 @@ Mercado: Binance (DOGE activo) + Alpaca (Stocks watch)
 """
 import hashlib, hmac, time, requests, json, os, sys
 from datetime import datetime
+from load_env import env_float, load_env, status_dir
+
+load_env()
 
 # ─── Load API keys from environment ───
-BIN_API_KEY = os.environ.get("BINANCE_API_KEY_2", "NOT_SET")
-BIN_SECRET = os.environ.get("BINANCE_SECRET_KEY_2", "NOT_SET")
+BIN_API_KEY = os.environ.get("BINANCE_API_KEY", "NOT_SET")
+BIN_SECRET = os.environ.get("BINANCE_SECRET_KEY", "NOT_SET")
 BIN_HEADERS = {'X-MBX-APIKEY': BIN_API_KEY}
 
 ALPACA_API_KEY = os.environ.get("ALPACA_API_KEY", "NOT_SET")
-ALPACA_SECRET = os.environ.get("ALPACA_SECRET_KEY_3", "NOT_SET")
+ALPACA_SECRET = os.environ.get("ALPACA_SECRET_KEY", "NOT_SET")
 ALPACA_HEADERS = {
     'APCA-API-KEY-ID': ALPACA_API_KEY,
     'APCA-API-SECRET-KEY': ALPACA_SECRET
 }
 
 # ─── State file for change detection ───
-STATE_FILE = os.path.join(os.path.dirname(__file__), "clawtrader_state.json")
+STATE_FILE = status_dir() / "clawtrader_state.json"
+DOGE_ENTRY = env_float("CLAWTRADER_DOGE_ENTRY", 0)
+DOGE_QTY_REFERENCE = env_float("CLAWTRADER_DOGE_QTY_REFERENCE", 0)
+DOGE_STOP = env_float("CLAWTRADER_DOGE_STOP", 0)
 
 def load_state():
     try:
@@ -34,12 +40,14 @@ def save_state(s):
 
 # ─── Binance signed GET ───
 def bg(endpoint, params):
+    if BIN_API_KEY == "NOT_SET" or BIN_SECRET == "NOT_SET":
+        return None
     p = params.copy()
     p['timestamp'] = int(time.time() * 1000)
     p['recvWindow'] = 60000
     qs = '&'.join(f"{k}={v}" for k, v in sorted(p.items()))
     sig = hmac.new(BIN_SECRET.encode(), qs.encode(), hashlib.sha256).hexdigest()
-    url = f"https://api.binance.com{endpoint}?{qs}&signature=***"
+    url = f"https://api.binance.com{endpoint}?{qs}&signature={sig}"
     r = requests.get(url, headers=BIN_HEADERS, timeout=10)
     if r.status_code != 200:
         return None
@@ -47,12 +55,14 @@ def bg(endpoint, params):
 
 # ─── Binance signed POST/DELETE ───
 def bp(endpoint, method, params):
+    if BIN_API_KEY == "NOT_SET" or BIN_SECRET == "NOT_SET":
+        return None
     p = params.copy()
     p['timestamp'] = int(time.time() * 1000)
     p['recvWindow'] = 60000
     qs = '&'.join(f"{k}={v}" for k, v in sorted(p.items()))
     sig = hmac.new(BIN_SECRET.encode(), qs.encode(), hashlib.sha256).hexdigest()
-    url = f"https://api.binance.com{endpoint}?{qs}&signature=***"
+    url = f"https://api.binance.com{endpoint}?{qs}&signature={sig}"
     if method == 'DELETE':
         r = requests.delete(url, headers=BIN_HEADERS, timeout=10)
     else:
@@ -82,10 +92,11 @@ def get_doge():
     h24 = float(s24.get('highPrice', doge_price))
     l24 = float(s24.get('lowPrice', doge_price))
     pos = ((doge_price - l24) / (h24 - l24)) * 100 if (h24 - l24) > 0 else 50
-    ds = (doge_price / 0.09450 - 1) * 100
+    stop_price = DOGE_STOP or doge_price
+    ds = (doge_price / stop_price - 1) * 100 if stop_price else 0
     
     # Si no tenemos DOGE, reporte en modo observación
-    if qty < 30:
+    if qty < 30 or DOGE_ENTRY <= 0 or DOGE_QTY_REFERENCE <= 0:
         return {
             'p': doge_price, 'pnl': 0, 'pnl_pct': 0,
             'val': 0, 'cost': 0, 'entry': doge_price, 'qty': 0,
@@ -94,9 +105,8 @@ def get_doge():
             'orders': [], 'no_position': True
         }
     
-    # Posición activa — hardcodeada para esta sesión
-    entry = 0.09593
-    cost = entry * 242.0
+    entry = DOGE_ENTRY
+    cost = entry * DOGE_QTY_REFERENCE
     value = doge_price * qty
     pnl = value - cost
     pnl_pct = (doge_price / entry - 1) * 100
@@ -161,15 +171,17 @@ def build(d, m, a, state, full):
     # DOGE
     if d.get('no_position', False):
         lines.append(f"━━━ **🐶 DOGE/USDT** 🔴 **${d['p']:.5f}** ━━━")
-        lines.append(f"**Sin posición abierta** | Capital disponible: **${d['usdt_free']:.2f}** (más ~${23.98-d['usdt_free']:.2f} en DOGE remanentes)")
+        lines.append(f"**Sin posición abierta** | Capital disponible: **${d['usdt_free']:.2f}**")
         lines.append(f"Rango 24h: ${d['l24']:.5f} - ${d['h24']:.5f}")
-        lines.append(f"Stop fantasma: $0.09450 | Distancia: {d['ds']:.1f}% — sin exposición")
+        if DOGE_STOP > 0:
+            lines.append(f"Stop de referencia: ${DOGE_STOP:.5f} | Distancia: {d['ds']:.1f}% - sin exposición")
     else:
         emoji = "🟢" if d['pnl'] >= 0 else ("🟡" if d['pnl'] > -0.30 else "🔴")
         lines.append(f"━━━ **🐶 DOGE/USDT** {'🟢' if d['pnl_pct']>=0 else '🔴'} **${d['p']:.5f}** ━━━")
         lines.append(f"PnL: **{d['pnl']:+.2f} USDT** ({d['pnl_pct']:+.2f}%)  |  Capital: **${d['val']+d['usdt_free']:.2f}**")
         lines.append(f"Entrada: ${d['entry']:.5f}  |  Cant: {d['qty']:.0f} DOGE  |  Inversión: ${d['cost']:.2f}")
-        lines.append(f"Stop: $0.09450 → a **{d['ds']:.1f}%**  |  Rango 24h: ${d['l24']:.5f} - ${d['h24']:.5f} ({d['pos']:.0f}%)")
+        stop_text = f"${DOGE_STOP:.5f}" if DOGE_STOP > 0 else "N/A"
+        lines.append(f"Stop: {stop_text} -> a **{d['ds']:.1f}%**  |  Rango 24h: ${d['l24']:.5f} - ${d['h24']:.5f} ({d['pos']:.0f}%)")
     
     if d['orders']:
         lines.append("")
@@ -186,10 +198,10 @@ def build(d, m, a, state, full):
     lines.append("━ **⚠️ ALERTAS** ━")
     if d.get('no_position', False):
         lines.append("🔍 **MODO OBSERVACIÓN** — sin posiciones abiertas")
-        if d['p'] <= 0.09450:
-            lines.append("DOGE tocó stop — bien que estamos fuera 👌")
+        if DOGE_STOP > 0 and d['p'] <= DOGE_STOP:
+            lines.append("DOGE tocó stop — sin exposición abierta")
     else:
-        if d['p'] <= 0.09450:
+        if DOGE_STOP > 0 and d['p'] <= DOGE_STOP:
             lines.append("🔴 **STOP LOSS — VENDER TODO AHORA**")
         elif d['ds'] < 0.5:
             lines.append("🔴 **STOP INMINENTE — prepárate**")
@@ -228,7 +240,7 @@ def build(d, m, a, state, full):
     # Stocks
     lines.append("")
     lines.append("━━━ **🏛️ STOCKS** ━━━")
-    lines.append("Alpaca: **$100,873.55** | 100% cash")
+    lines.append("Alpaca: estado de watchlist")
     top_list = []
     for nm, x in a.items():
         ar = "🟢" if x.get('ch',0) >= 0 else "🔴"

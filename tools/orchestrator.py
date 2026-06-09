@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 """
 ClawTrader Orchestrator v1.0
-Orquesta los sub-agentes: Market Analyst → Risk Manager → Executor → Journalist
+Orquesta los sub-agentes: Market Analyst -> Risk Manager -> Executor -> Journalist
 Corre en background como proceso independiente.
-Ing. Gilbert — 29 Mayo 2026
 """
 import json
 import subprocess
@@ -12,8 +11,10 @@ import time
 import warnings
 from datetime import datetime
 from pathlib import Path
+from load_env import env_float, load_env
 
 warnings.filterwarnings("ignore")
+load_env()
 
 TOOLS_DIR = Path(__file__).parent
 MEMORY_DIR = TOOLS_DIR.parent / "memory"
@@ -134,7 +135,7 @@ def trading_cycle():
         return
     
     # 3. Build proposal
-    capital = 99996.30
+    capital = env_float("CLAWTRADER_CAPITAL", 1000)
     direction = "LONG" if score > 0 else "SHORT"
     entry = price
     

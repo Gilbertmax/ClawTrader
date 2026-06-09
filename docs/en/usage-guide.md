@@ -27,7 +27,7 @@ python3 tools/autonomous_monitor.py
 
 # View web dashboard
 python3 tools/server.py
-# Open http://localhost:5000 in your browser
+# Open http://localhost:8080 in your browser
 
 # Run the orchestrator
 python3 tools/orchestrator.py
@@ -153,7 +153,7 @@ The log includes:
 
 ## 🌐 Web dashboard
 
-The web dashboard (port 5000) lets you view:
+The web dashboard (port 8080) lets you view:
 
 - Open positions
 - Trade history
@@ -164,7 +164,7 @@ The web dashboard (port 5000) lets you view:
 ```bash
 # Start the dashboard
 python3 tools/server.py
-# Open: http://localhost:5000
+# Open: http://localhost:8080
 ```
 
 ---

@@ -9,20 +9,26 @@ from datetime import datetime
 from urllib.parse import urlencode
 import requests as r
 import yfinance as yf
+from load_env import env_bool, env_float, load_env, status_dir
+
+load_env()
 
 # ===== CREDENTIALS =====
 # Cargadas de variables de entorno
 ALPACA_KEY = os.environ.get("ALPACA_API_KEY", "NOT_SET")
-ALPACA_SECRET = os.environ.get("ALPACA_SECRET_KEY_2", "NOT_SET")
+ALPACA_SECRET = os.environ.get("ALPACA_SECRET_KEY", "NOT_SET")
 ALPACA_URL = "https://paper-api.alpaca.markets"
 ALPACA_HEADERS = {"APCA-API-KEY-ID": ALPACA_KEY, "APCA-API-SECRET-KEY": ALPACA_SECRET}
 
-BINANCE_KEY = os.environ.get("BINANCE_API_KEY_2", "NOT_SET")
-BINANCE_SECRET = os.environ.get("BINANCE_SECRET_KEY_2", "NOT_SET")
+BINANCE_KEY = os.environ.get("BINANCE_API_KEY", "NOT_SET")
+BINANCE_SECRET = os.environ.get("BINANCE_SECRET_KEY", "NOT_SET")
 BINANCE_API = "https://api.binance.com"
 BINANCE_HEADERS = {"X-MBX-APIKEY": BINANCE_KEY}
 
-STATUS_FILE = "/tmp/clawtrader_status.json"
+STATUS_FILE = status_dir() / "clawtrader_status.json"
+DRY_RUN = env_bool("CLAWTRADER_DRY_RUN", True)
+LIVE_TRADING = env_bool("CLAWTRADER_LIVE_TRADING", False)
+CAPITAL = env_float("CLAWTRADER_CAPITAL", 1000)
 
 # ===== BINANCE HELPERS (URLENCODE CORRECTO) =====
 def binance_signed(params):
@@ -35,6 +41,8 @@ def binance_signed(params):
     return query, sig
 
 def binance_account():
+    if BINANCE_KEY == "NOT_SET" or BINANCE_SECRET == "NOT_SET":
+        return DummyResponse(401, {"error": "Binance credentials not configured"})
     query, sig = binance_signed({})
     url = f"{BINANCE_API}/api/v3/account?{query}&signature={sig}"
     return r.get(url, headers=BINANCE_HEADERS, timeout=10)
@@ -50,6 +58,8 @@ def binance_market_buy(symbol, quote_qty):
     }
     query, sig = binance_signed(params)
     url = f"{BINANCE_API}/api/v3/order?{query}&signature={sig}"
+    if DRY_RUN or not LIVE_TRADING:
+        return DummyResponse(200, {"dry_run": True, "symbol": symbol, "quoteOrderQty": quote_qty, "fills": []})
     return r.post(url, headers=BINANCE_HEADERS, timeout=10)
 
 def binance_oco_sell(symbol, qty, price, stop, t1):
@@ -76,7 +86,17 @@ def binance_oco_sell(symbol, qty, price, stop, t1):
     }
     query, sig = binance_signed(params)
     url = f"{BINANCE_API}/api/v3/order/oco?{query}&signature={sig}"
+    if DRY_RUN or not LIVE_TRADING:
+        return DummyResponse(200, {"dry_run": True, "orderReports": []})
     return r.post(url, headers=BINANCE_HEADERS, timeout=10)
+
+class DummyResponse:
+    def __init__(self, status_code, body):
+        self.status_code = status_code
+        self._body = body
+
+    def json(self):
+        return self._body
 
 # ===== STOCK ANALYSIS (yfinance) =====
 def analyze_stock(sym):
@@ -231,6 +251,8 @@ def alpaca_bracket(sym, qty, price, stop, t1):
         "take_profit": {"limit_price": str(t1)},
         "stop_loss": {"stop_price": str(stop), "limit_price": str(stop)}
     }
+    if DRY_RUN or not LIVE_TRADING:
+        return DummyResponse(200, {"dry_run": True, "id": "dry-run", "payload": payload})
     return r.post(f"{ALPACA_URL}/v2/orders", headers=ALPACA_HEADERS, json=payload, timeout=10)
 
 # ===== ASSETS TO MONITOR =====
@@ -279,7 +301,10 @@ if __name__ == "__main__":
     
     # Alpaca account
     try:
-        a_resp = r.get(f"{ALPACA_URL}/v2/account", headers=ALPACA_HEADERS, timeout=5)
+        if ALPACA_KEY == "NOT_SET" or ALPACA_SECRET == "NOT_SET":
+            a_resp = DummyResponse(401, {"error": "Alpaca credentials not configured"})
+        else:
+            a_resp = r.get(f"{ALPACA_URL}/v2/account", headers=ALPACA_HEADERS, timeout=5)
         if a_resp.status_code == 200:
             a = a_resp.json()
             results["alpaca"] = {"equity": float(a["equity"]), "cash": float(a["cash"])}
@@ -418,7 +443,7 @@ if __name__ == "__main__":
         print(f"\n⏳ Sin entrada. Monitoreando.", flush=True)
     
     # --- WRITE STATUS ---
-    tmp = STATUS_FILE + ".tmp"
+    tmp = STATUS_FILE.with_suffix(STATUS_FILE.suffix + ".tmp")
     try:
         with open(tmp, 'w') as f:
             json.dump(results, f)

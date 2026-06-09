@@ -2,12 +2,15 @@
 """Monitor ETH spot position - alerts on significant changes"""
 import requests as r, hmac, hashlib, time, json, os, sys
 from urllib.parse import urlencode
-import re
+from load_env import load_env
+
+load_env()
 
 def get_keys():
-    content = open("/home/gilbertoglez/.openclaw/workspace/tools/Binance Apikeys").read()
-    API_KEY = re.search(r"Api key\s*=\s*(\S+)", content).group(1)
-    SECRET_KEY = re.search(r"Secret Key\s*=\s*(\S+)", content).group(1)
+    API_KEY = os.environ.get("BINANCE_API_KEY")
+    SECRET_KEY = os.environ.get("BINANCE_SECRET_KEY")
+    if not API_KEY or not SECRET_KEY:
+        raise RuntimeError("BINANCE_API_KEY y BINANCE_SECRET_KEY no están configuradas")
     return API_KEY, SECRET_KEY
 
 def get_balance(API_KEY, SECRET_KEY):
@@ -16,7 +19,7 @@ def get_balance(API_KEY, SECRET_KEY):
     params = {"timestamp": st}
     q = urlencode(params)
     s = hmac.new(SECRET_KEY.encode(), q.encode(), hashlib.sha256).hexdigest()
-    acc = r.get(f"https://api.binance.com/api/v3/account?{q}&signature=***", headers=h, timeout=10).json()
+    acc = r.get(f"https://api.binance.com/api/v3/account?{q}&signature={s}", headers=h, timeout=10).json()
     
     eth = 0
     usdt = 0

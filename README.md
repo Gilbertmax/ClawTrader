@@ -29,7 +29,7 @@
 | ⏰ **Monitoreo 24/7** | Vigilancia continua de posiciones abiertas con alertas en tiempo real |
 | 📈 **TA-Lib Real** | Análisis técnico con indicadores reales: RSI, MACD, BBands, EMAs |
 | 📝 **Bitácora Automática** | Cada operación se registra automáticamente para análisis posterior |
-| 🔐 **Seguridad** | APIs guardadas en base64, .env cifrado protegido por .gitignore |
+| 🔐 **Seguridad** | Credenciales en `.env`, excluidas de git, y trading real desactivado por defecto |
 
 ### 📋 Requisitos
 
@@ -60,7 +60,7 @@ python3 install.py
 npm install -g openclaw
 ```
 
-> 💡 **¿No tienes cuenta en Binance?** [¡Crea una aquí con mi enlace de referido!](https://www.binance.com/referral/earn-together/refer2earn-usdc/claim?hl=es-LA&ref=GRO_28502_BYDAT&utm_source=referral_entrance)
+> 💡 **¿No tienes cuenta en Binance?** [¡Crea una aquí!](https://www.binance.com/referral/earn-together/refer2earn-usdc/claim?hl=es-LA&ref=GRO_28502_BYDAT&utm_source=referral_entrance)
 
 ### 🔑 Configuración de APIs
 
@@ -94,7 +94,7 @@ python3 tools/autonomous_monitor.py
 
 # Ver dashboard de trading
 python3 tools/server.py
-# Luego abre http://localhost:5000
+# Luego abre http://localhost:8080
 ```
 
 O simplemente habla con ClawTrader en Telegram para recibir señales y gestionar operaciones.
@@ -141,9 +141,17 @@ ClawTrader/
     └── en/                    # 🇬🇧 Guides in English
 ```
 
-### 📜 Licencia
+### 📜 Licencia y Donaciones
 
-MIT — Proyecto personal. Úsalo, modifícalo, mejóralo. El trading conlleva riesgo de pérdida de capital.
+ClawTrader es open source bajo [licencia MIT](LICENSE). Úsalo, modifícalo y mejóralo.
+
+Para colaborar, revisa la [guía de contribución](docs/CONTRIBUTING.md).
+
+Si este proyecto te ayuda y quieres apoyar su desarrollo:
+
+**PayPal:** `gilbertoreysena@hotmail.com`
+
+El trading conlleva riesgo de pérdida de capital.
 
 ---
 
@@ -165,7 +173,7 @@ MIT — Proyecto personal. Úsalo, modifícalo, mejóralo. El trading conlleva r
 | ⏰ **24/7 Monitoring** | Continuous position tracking with real-time alerts |
 | 📈 **Real TA-Lib** | Technical analysis with real indicators: RSI, MACD, BBands, EMAs |
 | 📝 **Auto Journal** | Every trade is automatically logged for post-analysis |
-| 🔐 **Security** | APIs stored in base64, .env encrypted via .gitignore |
+| 🔐 **Security** | Credentials stored in `.env`, excluded from git, with live trading disabled by default |
 
 ### 📋 Requirements
 
@@ -230,7 +238,7 @@ python3 tools/autonomous_monitor.py
 
 # View trading dashboard
 python3 tools/server.py
-# Then open http://localhost:5000
+# Then open http://localhost:8080
 ```
 
 Or just talk to ClawTrader on Telegram to receive signals and manage trades.
@@ -277,6 +285,14 @@ ClawTrader/
     └── en/                    # 🇬🇧 English guides
 ```
 
-### 📜 License
+### 📜 License And Donations
 
-MIT — Personal project. Use it, modify it, improve it. Trading involves risk of capital loss.
+ClawTrader is open source under the [MIT License](LICENSE). Use it, modify it, and improve it.
+
+To contribute, read the [contribution guide](docs/CONTRIBUTING.en.md).
+
+If this project helps you and you want to support development:
+
+**PayPal:** `gilbertoreysena@hotmail.com`
+
+Trading involves risk of capital loss.

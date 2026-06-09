@@ -1,15 +1,18 @@
 #!/usr/bin/env python3
 """
 AlpacaTrader — Ejecución de órdenes via Alpaca Paper Trading API
-ClawTrader System — Ing. Gilbert
 Usa REST API directamente (sin librerías) para consistencia.
 """
 import requests, json, time, warnings, os
+from load_env import env_bool, load_env
 warnings.filterwarnings("ignore")
+load_env()
 
 API_KEY = os.environ.get("ALPACA_API_KEY", "NOT_SET")
 API_SECRET = os.environ.get("ALPACA_SECRET_KEY", "NOT_SET")
 BASE = os.environ.get("ALPACA_BASE_URL", "https://paper-api.alpaca.markets/v2")
+DRY_RUN = env_bool("CLAWTRADER_DRY_RUN", True)
+LIVE_TRADING = env_bool("CLAWTRADER_LIVE_TRADING", False)
 HEADERS = {
     "APCA-API-KEY-ID": API_KEY,
     "APCA-API-SECRET-KEY": API_SECRET,
@@ -24,10 +27,18 @@ class AlpacaTrader:
         self._verify()
     
     def _get(self, path, params=None):
+        if DRY_RUN or not LIVE_TRADING:
+            if path == "/account":
+                return {"status": "ACTIVE", "equity": "0", "cash": "0", "buying_power": "0"}
+            if path in ("/positions", "/orders"):
+                return []
+            return {"dry_run": True, "path": path, "params": params or {}}
         r = requests.get(f"{BASE}{path}", headers=HEADERS, params=params)
         return r.json() if r.status_code == 200 else {"error": r.text}
     
     def _post(self, path, data):
+        if DRY_RUN or not LIVE_TRADING:
+            return {"dry_run": True, "path": path, "data": data, "id": "dry-run", "status": "accepted"}
         r = requests.post(f"{BASE}{path}", headers=HEADERS, json=data)
         return r.json() if r.status_code in (200, 201) else {"error": r.text, "code": r.status_code}
     
@@ -36,6 +47,8 @@ class AlpacaTrader:
         return r.status_code in (200, 204)
     
     def _verify(self):
+        if DRY_RUN or not LIVE_TRADING:
+            return
         a = self._get("/account")
         assert a.get("status") == "ACTIVE", f"Cuenta no activa: {a.get('status')}"
     

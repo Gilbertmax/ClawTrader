@@ -6,12 +6,16 @@
 ║  Binance + Alpaca + Telegram                                ║
 ╚══════════════════════════════════════════════════════════════╝
 """
-import os, sys, json, shutil, subprocess, getpass
+import shutil
+from pathlib import Path
 
 VERSION = "1.0.0"
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-WORKSPACE = os.path.expanduser("~/.openclaw/workspace")
-HOME = os.path.expanduser("~")
+SCRIPT_DIR = Path(__file__).resolve().parent
+HOME = Path.home()
+OPENCLAW_HOME = HOME / ".openclaw"
+WORKSPACE = OPENCLAW_HOME / "workspace"
+TOOLS_DIR = WORKSPACE / "tools"
+SKILLS_DIR = OPENCLAW_HOME / "skills"
 
 # ─── Mensajes multi-idioma ───
 MSGS = {
@@ -50,10 +54,10 @@ MSGS = {
    → Habla con ClawTrader en Telegram
 
 4. Si necesitas regenerar el .env:
-   python3 ~/ClawTrader/install.py
+   python3 install.py
 
 5. Documentación en:
-   ~/ClawTrader/docs/
+   ./docs/
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 """,
@@ -94,10 +98,10 @@ MSGS = {
    → Talk to ClawTrader on Telegram
 
 4. To regenerate .env:
-   python3 ~/ClawTrader/install.py
+   python3 install.py
 
 5. Documentation at:
-   ~/ClawTrader/docs/
+   ./docs/
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 """,
@@ -160,8 +164,13 @@ def main():
         env_data["TELEGRAM_CHAT_ID"] = prompt(say("ask_tg_chat", lang), lang=lang)
     
     # ─── Generar .env ───
-    env_path = os.path.join(WORKSPACE, ".env")
-    os.makedirs(WORKSPACE, exist_ok=True)
+    env_data["CLAWTRADER_DRY_RUN"] = "true"
+    env_data["CLAWTRADER_LIVE_TRADING"] = "false"
+    env_data["CLAWTRADER_CAPITAL"] = env_data.get("CLAWTRADER_CAPITAL", "1000")
+    env_data["CLAWTRADER_STATUS_DIR"] = str(WORKSPACE / "state")
+
+    env_path = WORKSPACE / ".env"
+    WORKSPACE.mkdir(parents=True, exist_ok=True)
     
     with open(env_path, "w") as f:
         f.write("# ClawTrader — Credenciales (generado por instalador)\n")
@@ -173,61 +182,49 @@ def main():
     print(f"\n✅ {say('env_created', lang, path=env_path)}")
     
     # ─── Crear .env.example ───
-    example_path = os.path.join(WORKSPACE, ".env.example")
+    example_path = WORKSPACE / ".env.example"
     with open(example_path, "w") as f:
         f.write("# .env.example — Copia como .env y completa tus keys\n")
         f.write("# BINANCE\n")
-        f.write("BINANCE_API_KEY=***\n")
-        f.write("BINANCE_SECRET_KEY=***\n\n")
+        f.write("BINANCE_API_KEY=\n")
+        f.write("BINANCE_SECRET_KEY=\n\n")
         f.write("# ALPACA (opcional — paper trading demo)\n")
-        f.write("# ALPACA_API_KEY=***\n")
-        f.write("# ALPACA_SECRET_KEY=***\n")
+        f.write("# ALPACA_API_KEY=\n")
+        f.write("# ALPACA_SECRET_KEY=\n")
         f.write("# ALPACA_BASE_URL=https://paper-api.alpaca.markets/v2\n\n")
         f.write("# TELEGRAM (opcional — notificaciones)\n")
-        f.write("# TELEGRAM_BOT_TOKEN=***\n")
-        f.write("# TELEGRAM_CHAT_ID=***\n")
+        f.write("# TELEGRAM_BOT_TOKEN=\n")
+        f.write("# TELEGRAM_CHAT_ID=\n")
+        f.write("\n# SEGURIDAD\n")
+        f.write("CLAWTRADER_DRY_RUN=true\n")
+        f.write("CLAWTRADER_LIVE_TRADING=false\n")
+        f.write("CLAWTRADER_CAPITAL=1000\n")
+        f.write(f"CLAWTRADER_STATUS_DIR={WORKSPACE / 'state'}\n")
     
     print(f"✅ .env.example creado en {example_path}")
-    
-    # ─── Crear keys_b64.json ───
-    if use_binance and env_data.get("BINANCE_API_KEY") and env_data.get("BINANCE_SECRET_KEY"):
-        import base64
-        b64_data = {
-            "binance": {
-                "api_key_b64": base64.b64encode(env_data["BINANCE_API_KEY"].encode()).decode(),
-                "secret_key_b64": base64.b64encode(env_data["BINANCE_SECRET_KEY"].encode()).decode()
-            }
-        }
-        keys_b64_path = os.path.join(os.path.dirname(WORKSPACE), "tools", "keys_b64.json")
-        os.makedirs(os.path.dirname(keys_b64_path), exist_ok=True)
-        with open(keys_b64_path, "w") as f:
-            json.dump(b64_data, f, indent=2)
-        print(f"✅ keys_b64.json creado para market_scanner.py")
     
     # ─── PASO 2: Despliegue ───
     print(f"\n--- {say('step_deploy', lang)} ---\n")
     
     # Copiar scripts si hay source
-    src_tools = os.path.join(SCRIPT_DIR, "tools")
-    dst_tools = os.path.join(os.path.dirname(WORKSPACE), "tools")
-    if os.path.exists(src_tools) and src_tools != dst_tools:
-        os.makedirs(dst_tools, exist_ok=True)
-        for f in os.listdir(src_tools):
-            if f.endswith(".py") or f.endswith(".json"):
-                shutil.copy2(os.path.join(src_tools, f), dst_tools)
+    src_tools = SCRIPT_DIR / "tools"
+    dst_tools = TOOLS_DIR
+    if src_tools.exists() and src_tools != dst_tools:
+        dst_tools.mkdir(parents=True, exist_ok=True)
+        for f in src_tools.iterdir():
+            if f.suffix == ".py":
+                shutil.copy2(f, dst_tools / f.name)
     
     # Copiar skills
-    src_skills = os.path.join(SCRIPT_DIR, "skills")
-    dst_skills = os.path.expanduser("~/.openclaw/skills")
-    if os.path.exists(src_skills):
-        os.makedirs(dst_skills, exist_ok=True)
-        for skill_dir in os.listdir(src_skills):
-            sdir = os.path.join(src_skills, skill_dir)
-            if os.path.isdir(sdir):
-                ddir = os.path.join(dst_skills, skill_dir)
-                os.makedirs(ddir, exist_ok=True)
-                for sf in os.listdir(sdir):
-                    shutil.copy2(os.path.join(sdir, sf), ddir)
+    src_skills = SCRIPT_DIR / "skills" / lang
+    if src_skills.exists():
+        SKILLS_DIR.mkdir(parents=True, exist_ok=True)
+        for sdir in src_skills.iterdir():
+            if sdir.is_dir():
+                ddir = SKILLS_DIR / sdir.name
+                if ddir.exists():
+                    shutil.rmtree(ddir)
+                shutil.copytree(sdir, ddir)
     
     print(say("deploy_ok", lang))
     
@@ -235,10 +232,9 @@ def main():
     print(f"\n--- {say('step_finish', lang)} ---")
     print(say("finish_msg", lang))
     
-    # ─── Crear carpeta del proyecto en Documentos ───
-    docs_project = os.path.join(HOME, "Documentos", "ClawTrader")
-    os.makedirs(docs_project, exist_ok=True)
-    print(f"📁 Proyecto espejo creado en: {docs_project}")
+    state_dir = WORKSPACE / "state"
+    state_dir.mkdir(parents=True, exist_ok=True)
+    print(f"📁 Estado local creado en: {state_dir}")
 
 if __name__ == "__main__":
     main()

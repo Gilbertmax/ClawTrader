@@ -1,12 +1,15 @@
 #!/usr/bin/env python3
-"""Monitor ETH position - uses b64 keys to avoid ofuscation bug"""
-import base64, json, hmac, hashlib, requests
+"""Monitor ETH position using Binance credentials from the environment."""
+import json, hmac, hashlib, os, requests
 from urllib.parse import urlencode
+from load_env import load_env
 
-with open('/home/gilbertoglez/.openclaw/workspace/tools/keys_b64.json') as f:
-    d = json.load(f)['binance']
-API_KEY = base64.b64decode(d['api_key_b64']).decode()
-SECRET_KEY = base64.b64decode(d['secret_key_b64']).decode()
+load_env()
+
+API_KEY = os.environ.get("BINANCE_API_KEY")
+SECRET_KEY = os.environ.get("BINANCE_SECRET_KEY")
+if not API_KEY or not SECRET_KEY:
+    raise RuntimeError("BINANCE_API_KEY y BINANCE_SECRET_KEY no están configuradas")
 
 h = {"X-MBX-APIKEY": API_KEY}
 st = requests.get("https://api.binance.com/api/v3/time", timeout=5).json()["serverTime"]

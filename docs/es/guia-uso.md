@@ -27,7 +27,7 @@ python3 tools/autonomous_monitor.py
 
 # Ver dashboard web
 python3 tools/server.py
-# Abre http://localhost:5000 en tu navegador
+# Abre http://localhost:8080 en tu navegador
 
 # Ejecutar orquestador
 python3 tools/orchestrator.py
@@ -153,7 +153,7 @@ El registro incluye:
 
 ## 🌐 Dashboard web
 
-El dashboard web (puerto 5000) te permite ver:
+El dashboard web (puerto 8080) te permite ver:
 
 - Posiciones abiertas
 - Historial de operaciones
@@ -164,7 +164,7 @@ El dashboard web (puerto 5000) te permite ver:
 ```bash
 # Iniciar dashboard
 python3 tools/server.py
-# Abrir: http://localhost:5000
+# Abrir: http://localhost:8080
 ```
 
 ---

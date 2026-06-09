@@ -2,7 +2,6 @@
 """
 ClawTrader Analytics Engine v1.0
 Análisis técnico multi-activo con TA-Lib + yfinance
-Ing. Gilbert — 29 Mayo 2026
 """
 import argparse
 import json

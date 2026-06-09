@@ -9,16 +9,21 @@ import yfinance as yf
 import json, os, time, sys
 import requests as r
 from datetime import datetime
+from load_env import env_bool, env_float, load_env, status_dir
+
+load_env()
 
 # === CONFIG ===
 SYMBOL = "MSFT"
-CAPITAL = 100873.56
+CAPITAL = env_float("CLAWTRADER_CAPITAL", 1000)
 RISK_PER_TRADE = 0.005  # 0.5%
 STOP_PCT = 0.0085  # 0.85%
 RR_MIN = 1.5
-STATUS_FILE = "/tmp/clawtrader_status.json"
-TRADE_FILE = "/tmp/clawtrader_trade.json"
-PID_FILE = "/tmp/clawtrader_pid.txt"
+STATUS_FILE = status_dir() / "clawtrader_status.json"
+TRADE_FILE = status_dir() / "clawtrader_trade.json"
+PID_FILE = status_dir() / "clawtrader_pid.txt"
+DRY_RUN = env_bool("CLAWTRADER_DRY_RUN", True)
+LIVE_TRADING = env_bool("CLAWTRADER_LIVE_TRADING", False)
 
 # Alpaca credentials — leídas de variables de entorno
 ALPACA_KEY = os.environ.get("ALPACA_API_KEY", "NOT_SET")
@@ -27,6 +32,7 @@ ALPACA_BASE = os.environ.get("ALPACA_BASE_URL", "https://paper-api.alpaca.market
 ALPACA_HEADERS = {"APCA-API-KEY-ID": ALPACA_KEY, "APCA-API-SECRET-KEY": ALPACA_SECRET}
 
 def atomic_write(path, data):
+    path = os.fspath(path)
     tmp = path + ".tmp"
     with open(tmp, 'w') as f:
         json.dump(data, f)
@@ -142,6 +148,8 @@ def check_msft():
 
 def alpaca_account():
     """Obtiene estado de cuenta Alpaca"""
+    if ALPACA_KEY == "NOT_SET" or ALPACA_SECRET == "NOT_SET":
+        return None
     try:
         resp = r.get(f"{ALPACA_BASE}/account", headers=ALPACA_HEADERS, timeout=10)
         if resp.status_code == 200:
@@ -151,6 +159,8 @@ def alpaca_account():
         return None
 
 def alpaca_positions():
+    if ALPACA_KEY == "NOT_SET" or ALPACA_SECRET == "NOT_SET":
+        return []
     try:
         resp = r.get(f"{ALPACA_BASE}/positions", headers=ALPACA_HEADERS, timeout=10)
         if resp.status_code == 200:
@@ -160,6 +170,8 @@ def alpaca_positions():
         return []
 
 def alpaca_orders():
+    if ALPACA_KEY == "NOT_SET" or ALPACA_SECRET == "NOT_SET":
+        return []
     try:
         resp = r.get(f"{ALPACA_BASE}/orders", params={"status": "open"}, headers=ALPACA_HEADERS, timeout=10)
         if resp.status_code == 200:
@@ -183,6 +195,8 @@ def execute_trade(entry):
     }
     
     try:
+        if DRY_RUN or not LIVE_TRADING:
+            return {"dry_run": True, "order": order}
         resp = r.post(f"{ALPACA_BASE}/orders", headers=ALPACA_HEADERS, json=order, timeout=15)
         if resp.status_code in (200, 201):
             return resp.json()

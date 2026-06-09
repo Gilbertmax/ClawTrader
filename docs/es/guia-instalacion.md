@@ -52,10 +52,10 @@ Verás `(venv)` al inicio de la línea de comandos.
 ## Paso 3: Instalar dependencias de Python
 
 ```bash
-pip install ccxt pandas numpy python-dotenv flask ta-lib requests
+pip install -r requirements.txt
 ```
 
-Si `ta-lib` da problemas, instala primero la librería C:
+Si `TA-Lib` da problemas, instala primero la librería C:
 
 ```bash
 # Ubuntu/Debian
@@ -115,7 +115,7 @@ El instalador te guiará por:
 
 Al finalizar, se habrá creado:
 - `~/.openclaw/workspace/.env` — Tus credenciales
-- `~/.openclaw/workspace/tools/keys_b64.json` — Claves en base64 para el scanner
+- `~/.openclaw/workspace/state/` — Estado local y reportes temporales
 
 ## Paso 7: Desplegar tools y skills
 
@@ -153,7 +153,7 @@ npm install -g openclaw
 
 ### Error con TA-Lib
 ```bash
-# En lugar de pip install ta-lib, usa:
+# En lugar de pip install TA-Lib, usa:
 pip install TA-Lib --no-binary TA-Lib
 ```
 
@@ -172,8 +172,8 @@ Ejecuta estos comandos para verificar que todo está correcto:
 # 1. Verificar entorno virtual
 which python3
 
-# 2. Verificar variables de entorno
-cat ~/.openclaw/workspace/.env
+# 2. Verificar que existe el archivo de entorno sin mostrar secretos
+test -f ~/.openclaw/workspace/.env && echo ".env OK"
 
 # 3. Verificar tools
 ls tools/*.py | wc -l

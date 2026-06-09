@@ -2,7 +2,6 @@
 """
 ClawTrader Crypto Snapshot Engine v1.0
 Datos en vivo desde múltiples exchanges — síncrono, rápido
-Ing. Gilbert — 29 Mayo 2026
 """
 import argparse
 import json

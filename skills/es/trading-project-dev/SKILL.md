@@ -7,7 +7,7 @@ description: Desarrollo del proyecto local trading-agent usando Python, Ollama y
 
 Ruta principal:
 
-/home/gilbertoglez/AI/trading-agent
+Proyecto local de trading configurado por el usuario.
 
 Python:
 3.11

@@ -94,8 +94,8 @@ Si el usuario dice "rápido", usar local.
 
 Cuando corresponda, decir:
 
-"Ing. Gilbert, esto lo puedo resolver local rápido."
+"Esto lo puedo resolver local rápido."
 
 o
 
-"Ing. Gilbert, para este caso sí conviene usar el modelo cloud porque requiere más profundidad."
+"Para este caso sí conviene usar el modelo cloud porque requiere más profundidad."

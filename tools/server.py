@@ -2,7 +2,6 @@
 """
 ClawTrader Dashboard Server v1.0
 Sirve dashboard HTML + API de datos en vivo
-Ing. Gilbert — 29 Mayo 2026
 
 Usage:
   python3 tools/server.py              # Puerto 8080
@@ -114,11 +113,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
         if path in ('/', '/index.html'):
             self.send_header('Content-Type', 'text/html; charset=utf-8')
             self.end_headers()
-            html_path = TOOLS_DIR / 'dashboard.html'
-            if html_path.exists():
-                self.wfile.write(html_path.read_bytes())
-            else:
-                self.wfile.write(b'<h1>ClawTrader Dashboard</h1><p>Dashboard HTML not found.</p>')
+            self.wfile.write(default_dashboard_html().encode())
         
         elif path == '/api/tickers':
             self.send_header('Content-Type', 'application/json')
@@ -164,24 +159,41 @@ class Handler(http.server.BaseHTTPRequestHandler):
     def log_message(self, format, *args):
         print(f"[{time.strftime('%H:%M:%S')}] {args[0]} {args[1]} {args[2]}")
 
-def generate_html():
-    """Generate dashboard HTML from dashboard.py template if not exists"""
-    html_path = TOOLS_DIR / 'dashboard.html'
-    if not html_path.exists():
-        try:
-            import dashboard as db
-            html_path.write_text(db.HTML_TEMPLATE)
-            print(f"✅ Dashboard HTML generado: {html_path}")
-        except ImportError:
-            print("⚠️ dashboard.py not found, HTML not generated")
+def default_dashboard_html():
+    """Minimal self-contained dashboard so the server always has a UI."""
+    return """<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ClawTrader Dashboard</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 2rem; color: #172026; background: #f7f8fa; }
+    main { max-width: 980px; margin: 0 auto; }
+    pre { white-space: pre-wrap; background: #fff; border: 1px solid #d8dee4; padding: 1rem; border-radius: 8px; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>ClawTrader Dashboard</h1>
+    <pre id="data">Loading...</pre>
+  </main>
+  <script>
+    async function refresh() {
+      const res = await fetch('/api/tickers');
+      document.getElementById('data').textContent = JSON.stringify(await res.json(), null, 2);
+    }
+    refresh();
+    setInterval(refresh, 15000);
+  </script>
+</body>
+</html>"""
 
 def main():
     parser = argparse.ArgumentParser(description='ClawTrader Dashboard Server')
     parser.add_argument('--port', type=int, default=8080, help='Port (default: 8080)')
     parser.add_argument('--host', default='0.0.0.0', help='Host (default: 0.0.0.0)')
     args = parser.parse_args()
-    
-    generate_html()
     
     server = http.server.HTTPServer((args.host, args.port), Handler)
     print(f"""

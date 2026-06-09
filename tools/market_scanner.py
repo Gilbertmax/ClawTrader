@@ -1,15 +1,8 @@
 #!/usr/bin/env python3
 from urllib.request import urlopen
-import json, hmac, hashlib, urllib.parse
+import json
 
 MIN_SCORE = 6
-
-with open("/home/gilbertoglez/.openclaw/workspace/tools/keys_b64.json") as f:
-    d = json.load(f)["binance"]
-
-b = __import__("base64")
-API_KEY = b.b64decode(d["api_key_b64"]).decode("ascii")
-SECRET_KEY = b.b64decode(d["secret_key_b64"])
 
 def k(sym, iv, lim=50):
     with urlopen(f"https://api.binance.com/api/v3/klines?symbol={sym}&interval={iv}&limit={lim}", timeout=10) as r:
