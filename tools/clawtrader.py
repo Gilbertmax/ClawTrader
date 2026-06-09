@@ -5,6 +5,8 @@ import json
 
 from config import get_config
 
+DEFAULT_PRO_SYMBOLS = ["BTCUSDT", "ETHUSDT", "SOLUSDT", "BNBUSDT", "XRPUSDT", "ADAUSDT"]
+
 
 def print_json(data):
     print(json.dumps(data, indent=2, default=str))
@@ -28,6 +30,20 @@ def cmd_scan(args):
     result = run_scan(pairs=args.symbols, min_score=args.min_score)
     print_json(result)
     return 0 if result.get("best") else 1
+
+
+def cmd_pro_scan(args):
+    from market_intelligence import scan_symbols
+
+    print_json(scan_symbols(args.symbols))
+    return 0
+
+
+def cmd_decide(args):
+    from market_intelligence import score_symbol
+
+    print_json(score_symbol(args.symbol))
+    return 0
 
 
 def cmd_snapshot(args):
@@ -122,6 +138,14 @@ def build_parser():
     p.add_argument("--symbols", nargs="+", help="Symbols like BTCUSDT ETHUSDT")
     p.add_argument("--min-score", type=int, default=6)
     p.set_defaults(func=cmd_scan)
+
+    p = sub.add_parser("pro-scan", help="Run professional multi-timeframe decision scanner")
+    p.add_argument("--symbols", nargs="+", default=DEFAULT_PRO_SYMBOLS, help="Binance spot symbols like BTCUSDT ETHUSDT")
+    p.set_defaults(func=cmd_pro_scan)
+
+    p = sub.add_parser("decide", help="Build a professional decision plan for one Binance spot symbol")
+    p.add_argument("symbol", help="Binance spot symbol like BTCUSDT")
+    p.set_defaults(func=cmd_decide)
 
     p = sub.add_parser("snapshot", help="Fetch crypto market snapshot")
     p.add_argument("--symbols", nargs="+", default=["BTC/USDT", "ETH/USDT", "SOL/USDT"])

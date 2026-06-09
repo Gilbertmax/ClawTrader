@@ -25,7 +25,7 @@ MSGS = {
         "welcome_msg":   "Bienvenido al instalador de ClawTrader.\nSe configurará tu asistente de trading autónomo en OpenClaw.",
         "step_keys":     "🔑 PASO 1 — Configuración de APIs",
         "step_deploy":   "📁 PASO 2 — Despliegue de archivos",
-        "step_crons":    "⏰ PASO 3 — Programación de monitoreo",
+        "step_restart":  "🔄 PASO 3 — Reinicio de OpenClaw",
         "step_finish":   "✅ PASO 4 — Finalización",
         "openclaw_ok":   "✅ OpenClaw detectado: {version}",
         "openclaw_path_hint": """
@@ -60,6 +60,8 @@ Cuando eso funcione, vuelve a ejecutar:
         "ask_tg_chat":   "Pega tu Chat ID de Telegram: ",
         "env_created":   "✅ .env creado en {path}",
         "deploy_ok":     "✅ Archivos desplegados correctamente",
+        "restart_ok":    "✅ Servicio de OpenClaw reiniciado",
+        "restart_warn":  "⚠️  No se pudo reiniciar OpenClaw automáticamente. Reinicia manualmente con: openclaw daemon restart",
         "finish_msg": """
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ✅  Instalación completada.
@@ -90,7 +92,7 @@ Cuando eso funcione, vuelve a ejecutar:
         "welcome_msg":   "Welcome to the ClawTrader installer.\nYour autonomous trading assistant will be configured for OpenClaw.",
         "step_keys":     "🔑 STEP 1 — API Configuration",
         "step_deploy":   "📁 STEP 2 — File Deployment",
-        "step_crons":    "⏰ STEP 3 — Monitoring Schedule",
+        "step_restart":  "🔄 STEP 3 — Restart OpenClaw",
         "step_finish":   "✅ STEP 4 — Finish",
         "openclaw_ok":   "✅ OpenClaw detected: {version}",
         "openclaw_path_hint": """
@@ -125,6 +127,8 @@ When that works, run again:
         "ask_tg_chat":   "Paste your Telegram Chat ID: ",
         "env_created":   "✅ .env created at {path}",
         "deploy_ok":     "✅ Files deployed successfully",
+        "restart_ok":    "✅ OpenClaw service restarted",
+        "restart_warn":  "⚠️  OpenClaw could not be restarted automatically. Restart manually with: openclaw daemon restart",
         "finish_msg": """
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ✅  Installation complete.
@@ -194,6 +198,27 @@ def ensure_openclaw(lang):
     print(say("openclaw_ok", lang, version=version))
     if path_hint:
         print(MSGS[lang]["openclaw_path_hint"].format(bin_dir=fallback.parent))
+    return exe
+
+def restart_openclaw(exe, lang):
+    import subprocess
+    for command in (["daemon", "restart"], ["gateway", "restart"]):
+        try:
+            result = subprocess.run(
+                [exe, *command],
+                capture_output=True,
+                text=True,
+                timeout=30,
+                check=False,
+            )
+            if result.returncode == 0:
+                print(say("restart_ok", lang))
+                return True
+        except Exception:
+            continue
+
+    print(say("restart_warn", lang))
+    return False
 
 def main():
     # ─── Idioma ───
@@ -206,7 +231,7 @@ def main():
     print(f"{'='*60}\n")
     print(say("welcome_msg", lang))
     print()
-    ensure_openclaw(lang)
+    openclaw_exe = ensure_openclaw(lang)
 
     # ─── PASO 1: Keys ───
     print(f"\n--- {say('step_keys', lang)} ---\n")
@@ -298,6 +323,10 @@ def main():
                 shutil.copytree(sdir, ddir)
     
     print(say("deploy_ok", lang))
+
+    # ─── PASO 3: Reiniciar OpenClaw ───
+    print(f"\n--- {say('step_restart', lang)} ---\n")
+    restart_openclaw(openclaw_exe, lang)
     
     # ─── PASO 4: Fin ───
     print(f"\n--- {say('step_finish', lang)} ---")

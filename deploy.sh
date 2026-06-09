@@ -82,5 +82,13 @@ echo "╔═══════════════════════�
 echo "║   ✅ Despliegue completo ($LANG)             ║"
 echo "╚═══════════════════════════════════════════╝"
 echo ""
+echo "🔄 Reiniciando servicio de OpenClaw..."
+if "$OPENCLAW_BIN" daemon restart >/dev/null 2>&1 || "$OPENCLAW_BIN" gateway restart >/dev/null 2>&1; then
+    echo "   ✅ OpenClaw reiniciado"
+else
+    echo "   ⚠️  No se pudo reiniciar automáticamente."
+    echo "      Ejecuta manualmente: openclaw daemon restart"
+fi
+echo ""
 echo "📌 Próximo paso: Ejecuta 'openclaw' para iniciar"
 exit 0

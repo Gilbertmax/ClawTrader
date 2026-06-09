@@ -111,6 +111,8 @@ export PATH="$HOME/.npm-global/bin:$PATH"
 
 El instalador valida `openclaw --version` al inicio. Si OpenClaw no está instalado, fallará antes de pedir credenciales. Si OpenClaw existe en `~/.npm-global/bin/openclaw` pero no está en `PATH`, ClawTrader lo detectará y te avisará cómo corregir el `PATH`.
 
+Al finalizar, el instalador ejecuta `openclaw daemon restart` para que OpenClaw cargue las nuevas skills y tools.
+
 ```bash
 python3 install.py
 ```

@@ -66,6 +66,7 @@ python3 install.py
 ```
 
 El instalador valida OpenClaw antes de pedir credenciales. Si OpenClaw no existe, se detiene con instrucciones.
+Al terminar, reinicia el servicio de OpenClaw con `openclaw daemon restart` para que las skills y tools nuevas queden cargadas.
 
 > 💡 **¿No tienes cuenta en Binance?** [¡Crea una aquí!](https://www.binance.com/referral/earn-together/refer2earn-usdc/claim?hl=es-LA&ref=GRO_28502_BYDAT&utm_source=referral_entrance)
 
@@ -95,6 +96,12 @@ openclaw
 
 # Ejecutar scanner de mercado manualmente
 python3 tools/clawtrader.py scan
+
+# Ejecutar scanner profesional multi-timeframe
+python3 tools/clawtrader.py pro-scan --symbols BTCUSDT ETHUSDT SOLUSDT
+
+# Crear plan de decisión para un activo
+python3 tools/clawtrader.py decide BTCUSDT
 
 # Ver snapshot crypto en vivo
 python3 tools/clawtrader.py snapshot --exchanges binance
@@ -224,6 +231,7 @@ python3 install.py
 ```
 
 The installer validates OpenClaw before asking for credentials. If OpenClaw is missing, it stops with instructions.
+When it finishes, it restarts the OpenClaw service with `openclaw daemon restart` so the new skills and tools are loaded.
 
 > 💡 **Don't have a Binance account yet?** [Create one here with my referral link!](https://www.binance.com/referral/earn-together/refer2earn-usdc/claim?hl=es-LA&ref=GRO_28502_BYDAT&utm_source=referral_entrance)
 
@@ -253,6 +261,12 @@ openclaw
 
 # Run market scanner manually
 python3 tools/clawtrader.py scan
+
+# Run professional multi-timeframe scanner
+python3 tools/clawtrader.py pro-scan --symbols BTCUSDT ETHUSDT SOLUSDT
+
+# Build a decision plan for one asset
+python3 tools/clawtrader.py decide BTCUSDT
 
 # View live crypto snapshot
 python3 tools/clawtrader.py snapshot --exchanges binance

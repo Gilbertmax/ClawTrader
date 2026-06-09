@@ -22,6 +22,12 @@ Solo habla con tu bot de ClawTrader en Telegram. Puedes:
 # Ejecutar el scanner de mercado
 python3 tools/clawtrader.py scan
 
+# Ejecutar scanner profesional multi-timeframe
+python3 tools/clawtrader.py pro-scan --symbols BTCUSDT ETHUSDT SOLUSDT
+
+# Crear plan de decisión para un activo
+python3 tools/clawtrader.py decide BTCUSDT
+
 # Ver snapshot crypto en vivo
 python3 tools/clawtrader.py snapshot --exchanges binance
 
@@ -44,6 +50,10 @@ openclaw
 ## 📊 Interpretar señales del scanner
 
 El scanner asigna un **score** a cada oportunidad detectada:
+
+El comando `pro-scan` usa análisis multi-timeframe (`15m`, `1h`, `4h`, `1d`), tendencia, momentum,
+volatilidad, volumen, liquidez, filtros de Binance y validación de riesgo. El comando `decide` muestra
+el mismo análisis para un solo activo e incluye plan de entrada, stop loss, take profit y barreras ATR.
 
 | Score | Significado | Acción |
 |---|---|---|
@@ -174,6 +184,12 @@ python3 tools/clawtrader.py dashboard
 ```bash
 # Verificar conexión a Binance
 python3 tools/clawtrader.py snapshot --exchanges binance --symbols BTC/USDT
+
+# Scanner profesional multi-timeframe
+python3 tools/clawtrader.py pro-scan --symbols BTCUSDT ETHUSDT SOLUSDT
+
+# Plan profesional para un activo
+python3 tools/clawtrader.py decide BTCUSDT
 
 # Ejecutar análisis rápido
 python3 tools/clawtrader.py analyze BTC-USD --period 5d --interval 1h
