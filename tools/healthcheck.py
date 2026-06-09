@@ -17,8 +17,13 @@ def check_module(name):
 
 def check_openclaw():
     exe = shutil.which("openclaw")
+    path_warning = None
+    fallback = Path.home() / ".npm-global" / "bin" / "openclaw"
+    if not exe and fallback.exists():
+        exe = str(fallback)
+        path_warning = f"{fallback.parent} is not in PATH"
     if not exe:
-        return {"installed": False, "version": None}
+        return {"installed": False, "version": None, "path_warning": None}
     try:
         result = subprocess.run(
             [exe, "--version"],
@@ -30,7 +35,7 @@ def check_openclaw():
         version = (result.stdout or result.stderr or exe).strip().splitlines()[0]
     except Exception:
         version = exe
-    return {"installed": True, "version": version}
+    return {"installed": True, "version": version, "path_warning": path_warning}
 
 
 def main():

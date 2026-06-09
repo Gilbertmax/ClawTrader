@@ -30,16 +30,25 @@ fi
 echo "🌐 Idioma: $([ "$LANG" = "es" ] && echo "Español" || echo "English")"
 echo ""
 
-if ! command -v openclaw >/dev/null 2>&1; then
-    echo "❌ OpenClaw no está instalado o no está disponible en PATH."
+OPENCLAW_BIN="$(command -v openclaw || true)"
+if [ -z "$OPENCLAW_BIN" ] && [ -x "$HOME/.npm-global/bin/openclaw" ]; then
+    OPENCLAW_BIN="$HOME/.npm-global/bin/openclaw"
+    echo "⚠️  OpenClaw está instalado, pero no está en PATH."
+    echo "   Agrega esto a tu ~/.bashrc o ~/.zshrc:"
+    echo "   export PATH=\"$HOME/.npm-global/bin:\$PATH\""
+    echo ""
+fi
+
+if [ -z "$OPENCLAW_BIN" ]; then
+    echo "❌ OpenClaw no está instalado."
     echo "   Instala primero:"
-    echo "   npm install -g openclaw"
+    echo "   curl -fsSL https://openclaw.ai/install.sh | bash"
     echo "   Luego verifica:"
     echo "   openclaw --version"
     exit 1
 fi
 
-echo "✅ OpenClaw detectado: $(openclaw --version 2>/dev/null | head -1)"
+echo "✅ OpenClaw detectado: $("$OPENCLAW_BIN" --version 2>/dev/null | head -1)"
 echo ""
 
 # ─── Copiar tools ───

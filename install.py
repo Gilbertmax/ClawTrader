@@ -28,12 +28,18 @@ MSGS = {
         "step_crons":    "⏰ PASO 3 — Programación de monitoreo",
         "step_finish":   "✅ PASO 4 — Finalización",
         "openclaw_ok":   "✅ OpenClaw detectado: {version}",
+        "openclaw_path_hint": """
+⚠️  OpenClaw está instalado, pero no está en PATH.
+Para que funcione en nuevas terminales agrega esto a tu ~/.bashrc o ~/.zshrc:
+
+   export PATH="{bin_dir}:$PATH"
+""",
         "openclaw_missing": """
-❌ OpenClaw no está instalado o no está disponible en PATH.
+❌ OpenClaw no está instalado.
 
 ClawTrader instala skills y tools dentro de OpenClaw, así que primero necesitas instalar OpenClaw:
 
-   npm install -g openclaw
+   curl -fsSL https://openclaw.ai/install.sh | bash
 
 Después verifica:
 
@@ -87,12 +93,18 @@ Cuando eso funcione, vuelve a ejecutar:
         "step_crons":    "⏰ STEP 3 — Monitoring Schedule",
         "step_finish":   "✅ STEP 4 — Finish",
         "openclaw_ok":   "✅ OpenClaw detected: {version}",
+        "openclaw_path_hint": """
+⚠️  OpenClaw is installed, but it is not in PATH.
+To make it work in new terminals, add this to your ~/.bashrc or ~/.zshrc:
+
+   export PATH="{bin_dir}:$PATH"
+""",
         "openclaw_missing": """
-❌ OpenClaw is not installed or is not available in PATH.
+❌ OpenClaw is not installed.
 
 ClawTrader installs skills and tools inside OpenClaw, so you need to install OpenClaw first:
 
-   npm install -g openclaw
+   curl -fsSL https://openclaw.ai/install.sh | bash
 
 Then verify:
 
@@ -157,6 +169,11 @@ def prompt_yesno(msg, default="n", lang="es"):
 
 def ensure_openclaw(lang):
     exe = shutil.which("openclaw")
+    fallback = HOME / ".npm-global" / "bin" / "openclaw"
+    path_hint = False
+    if not exe and fallback.exists():
+        exe = str(fallback)
+        path_hint = True
     if not exe:
         print(MSGS[lang]["openclaw_missing"])
         raise SystemExit(1)
@@ -175,6 +192,8 @@ def ensure_openclaw(lang):
         version = exe
 
     print(say("openclaw_ok", lang, version=version))
+    if path_hint:
+        print(MSGS[lang]["openclaw_path_hint"].format(bin_dir=fallback.parent))
 
 def main():
     # ─── Idioma ───

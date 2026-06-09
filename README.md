@@ -34,7 +34,7 @@
 ### 📋 Requisitos
 
 - **Node.js** ≥ v18 (para OpenClaw)
-- **OpenClaw** (`npm install -g openclaw`)
+- **OpenClaw** (`curl -fsSL https://openclaw.ai/install.sh | bash`)
 - **Python 3.9+** con pip
 - **Cuenta en Binance** con API habilitada (opcional: Alpaca)
 - **Bot de Telegram** (opcional)
@@ -54,7 +54,7 @@ source venv/bin/activate
 pip install -r requirements.txt
 
 # 4. Instalar OpenClaw
-npm install -g openclaw
+curl -fsSL https://openclaw.ai/install.sh | bash
 openclaw --version
 
 # 5. Ejecutar instalador interactivo
@@ -186,7 +186,7 @@ El trading conlleva riesgo de pérdida de capital.
 ### 📋 Requirements
 
 - **Node.js** ≥ v18 (for OpenClaw)
-- **OpenClaw** (`npm install -g openclaw`)
+- **OpenClaw** (`curl -fsSL https://openclaw.ai/install.sh | bash`)
 - **Python 3.9+** with pip
 - **Binance account** with API enabled (optional: Alpaca)
 - **Telegram Bot** (optional)
@@ -206,7 +206,7 @@ source venv/bin/activate
 pip install -r requirements.txt
 
 # 4. Install OpenClaw
-npm install -g openclaw
+curl -fsSL https://openclaw.ai/install.sh | bash
 openclaw --version
 
 # 5. Run interactive installer

@@ -71,13 +71,19 @@ pip install TA-Lib
 ## Step 4: Install OpenClaw
 
 ```bash
-npm install -g openclaw
+curl -fsSL https://openclaw.ai/install.sh | bash
 ```
 
 Verify it's installed:
 
 ```bash
 openclaw --version
+```
+
+If the OpenClaw installer says `~/.npm-global/bin` is missing from `PATH`, add this to your `~/.bashrc` or `~/.zshrc` and open a new terminal:
+
+```bash
+export PATH="$HOME/.npm-global/bin:$PATH"
 ```
 
 ## Step 5: Create a Binance account
@@ -103,7 +109,7 @@ openclaw --version
 
 ## Step 6: Run the interactive installer
 
-The installer validates `openclaw --version` at startup. If OpenClaw is not installed or is not in `PATH`, it fails before asking for credentials.
+The installer validates `openclaw --version` at startup. If OpenClaw is not installed, it fails before asking for credentials. If OpenClaw exists at `~/.npm-global/bin/openclaw` but is not in `PATH`, ClawTrader detects it and tells you how to fix `PATH`.
 
 ```bash
 python3 install.py
@@ -146,7 +152,9 @@ pip install ccxt
 
 ### Error: "openclaw: command not found"
 ```bash
-npm install -g openclaw
+curl -fsSL https://openclaw.ai/install.sh | bash
+export PATH="$HOME/.npm-global/bin:$PATH"
+openclaw --version
 ```
 
 ### Binance permission error
