@@ -13,7 +13,7 @@
 
 ## ES — 🇪🇸 Español
 
-> ClawTrader es el primer **asistente de trading autónomo basado en IA** que opera a través de OpenClaw. Combina análisis técnico en tiempo real, gestión de riesgo profesional, y un sistema de toma de decisiones multi-agente — todo controlable desde Telegram.
+> ClawTrader es un asistente de trading open source para escaneo de mercado, gestión de riesgo, bitácora y flujos controlados de paper/live trading. El trading real está desactivado por defecto.
 
 ---
 
@@ -159,7 +159,7 @@ El trading conlleva riesgo de pérdida de capital.
 
 ## EN — 🇬🇧 English
 
-> ClawTrader is the first **AI-based autonomous trading assistant** powered by OpenClaw. It combines real-time technical analysis, professional risk management, and a multi-agent decision-making system — all controllable from Telegram.
+> ClawTrader is an open-source trading assistant for market scanning, risk management, journaling, and controlled paper/live trading workflows. Live trading is disabled by default.
 
 ### 🚀 Key Features
 
