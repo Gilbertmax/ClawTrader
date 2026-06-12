@@ -16,7 +16,6 @@ class ClawTraderConfig:
     live_trading: bool
     capital: float
     binance_configured: bool
-    alpaca_configured: bool
     telegram_configured: bool
 
     def safe_dict(self):
@@ -37,7 +36,6 @@ def get_config():
         live_trading=env_bool("CLAWTRADER_LIVE_TRADING", False),
         capital=env_float("CLAWTRADER_CAPITAL", 1000),
         binance_configured=bool(os.environ.get("BINANCE_API_KEY") and os.environ.get("BINANCE_SECRET_KEY")),
-        alpaca_configured=bool(os.environ.get("ALPACA_API_KEY") and os.environ.get("ALPACA_SECRET_KEY")),
         telegram_configured=bool(os.environ.get("TELEGRAM_BOT_TOKEN") and os.environ.get("TELEGRAM_CHAT_ID")),
     )
 

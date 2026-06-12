@@ -88,11 +88,11 @@ tmp=$(mktemp -d)
 HOME="$tmp" python3 install.py
 ```
 
-Si modificas el dashboard:
+Si modificas tools o estado del engine:
 
 ```bash
-python3 tools/clawtrader.py dashboard --host 127.0.0.1 --port 8765
-curl -s http://127.0.0.1:8765/health
+python3 tools/clawtrader.py health
+python3 tools/clawtrader.py engine
 ```
 
 ## Reglas Para Tools Python

@@ -45,8 +45,8 @@ timeframe: 5m
 
 ## Available Tools
 
-- trading_analytics.py (complete TA-Lib)
-- crypto_live.py (CCXT + yfinance)
+- clawtrader.py pro-scan (multi-timeframe analysis)
+- clawtrader.py smart-money (order book, BOS, liquidity sweeps)
 - yfinance (historical data)
 - Python subprocess to run scripts
 

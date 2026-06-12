@@ -193,8 +193,9 @@ ls tools/*.py | wc -l
 # 4. Verificar skills
 ls skills/es/ | head -5
 
-# 5. Probar conexión pública a Binance
-python3 tools/clawtrader.py snapshot --exchanges binance --symbols BTC/USDT
+# 5. Probar comandos principales
+python3 tools/clawtrader.py health
+python3 tools/clawtrader.py pro-scan --symbols BTCUSDT ETHUSDT
 
 # 6. Verificar OpenClaw
 openclaw --version

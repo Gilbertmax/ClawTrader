@@ -59,7 +59,6 @@ Tendencial limpio. Tendencial agotado. Rango operable. Rango sucio. Alta volatil
 - **Desordenada:** Entradas sin claridad.
 - **Peligrosa:** Venganza, martingala, impulsividad.
 
-## Bloqueo operativo (para Olymp Trade demo)
 Bloquea la operación si: No hay invalidación, no hay razón técnica, la entrada persigue precio, busca recuperar pérdida, el usuario dice "seguro sale", quiere duplicar monto, no sabe dónde salir, riesgo beneficio pobre, gráfico confuso.
 
 ## Reglas de uso de modelos

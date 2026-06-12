@@ -28,12 +28,11 @@ python3 tools/clawtrader.py pro-scan --symbols BTCUSDT ETHUSDT SOLUSDT
 # Crear plan de decisión para un activo
 python3 tools/clawtrader.py decide BTCUSDT
 
-# Ver snapshot crypto en vivo
-python3 tools/clawtrader.py snapshot --exchanges binance
+# Analizar Smart Money
+python3 tools/clawtrader.py smart-money BTCUSDT
 
-# Ver dashboard web
-python3 tools/clawtrader.py dashboard
-# Abre http://localhost:8080 en tu navegador
+# Ver estado del engine
+python3 tools/clawtrader.py engine
 
 # Validar instalación
 python3 tools/clawtrader.py health
@@ -152,29 +151,27 @@ El registro incluye:
 ```
 1. 📊 Scanner encuentra oportunidad (score 7+)
 2. 🛡️ Entry Validator verifica condiciones
-3. ✅ Si todo ok → Ejecutar compra en Binance
+3. ✅ Si todo ok → Simular o ejecutar compra solo si live trading está activado
 4. 📈 Position Tracker monitorea 24/7
-5. ⏰ SL o TP se ejecuta → Posición cerrada
+5. ⏰ SL o TP se evalúa → Posición cerrada si live trading está activado
 6. 📝 Bitácora registra resultado
 7. 📊 Reporte al usuario por Telegram
 ```
 
 ---
 
-## 🌐 Dashboard web
+## ⚙️ Estado del engine
 
-El dashboard web (puerto 8080) te permite ver:
+El comando `engine` te permite ver:
 
 - Posiciones abiertas
 - Historial de operaciones
-- Balance de cuenta
-- Señales recientes del scanner
-- Estadísticas de rendimiento
+- Estado interno del monitor
+- Configuración de trailing y SL/TP
 
 ```bash
-# Iniciar dashboard
-python3 tools/clawtrader.py dashboard
-# Abrir: http://localhost:8080
+# Ver estado del engine
+python3 tools/clawtrader.py engine
 ```
 
 ---
@@ -182,8 +179,8 @@ python3 tools/clawtrader.py dashboard
 ## 🆘 Comandos útiles
 
 ```bash
-# Verificar conexión a Binance
-python3 tools/clawtrader.py snapshot --exchanges binance --symbols BTC/USDT
+# Verificar instalación
+python3 tools/clawtrader.py health
 
 # Scanner profesional multi-timeframe
 python3 tools/clawtrader.py pro-scan --symbols BTCUSDT ETHUSDT SOLUSDT
@@ -191,8 +188,8 @@ python3 tools/clawtrader.py pro-scan --symbols BTCUSDT ETHUSDT SOLUSDT
 # Plan profesional para un activo
 python3 tools/clawtrader.py decide BTCUSDT
 
-# Ejecutar análisis rápido
-python3 tools/clawtrader.py analyze BTC-USD --period 5d --interval 1h
+# Analizar Smart Money
+python3 tools/clawtrader.py smart-money BTCUSDT
 
 # Validar riesgo de una propuesta
 python3 tools/clawtrader.py risk --entry 100 --current 101 --stop 97 --take-profit 106 --score 7 --amount 300

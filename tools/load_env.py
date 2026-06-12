@@ -29,13 +29,13 @@ def load_env(path=None):
     return True
 
 def workspace_dir():
-    return Path(os.environ.get("CLAWTRADER_WORKSPACE", Path.home() / ".openclaw" / "workspace"))
+    return Path(os.environ.get("CLAWTRADER_WORKSPACE", Path.home() / ".openclaw" / "workspace")).expanduser()
 
 def tools_dir():
-    return Path(os.environ.get("CLAWTRADER_TOOLS_DIR", workspace_dir() / "tools"))
+    return Path(os.environ.get("CLAWTRADER_TOOLS_DIR", workspace_dir() / "tools")).expanduser()
 
 def status_dir():
-    path = Path(os.environ.get("CLAWTRADER_STATUS_DIR", workspace_dir() / "state"))
+    path = Path(os.environ.get("CLAWTRADER_STATUS_DIR", workspace_dir() / "state")).expanduser()
     path.mkdir(parents=True, exist_ok=True)
     return path
 

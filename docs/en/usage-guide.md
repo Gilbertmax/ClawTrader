@@ -28,12 +28,11 @@ python3 tools/clawtrader.py pro-scan --symbols BTCUSDT ETHUSDT SOLUSDT
 # Build a decision plan for one asset
 python3 tools/clawtrader.py decide BTCUSDT
 
-# View live crypto snapshot
-python3 tools/clawtrader.py snapshot --exchanges binance
+# Analyze Smart Money
+python3 tools/clawtrader.py smart-money BTCUSDT
 
-# View web dashboard
-python3 tools/clawtrader.py dashboard
-# Open http://localhost:8080 in your browser
+# View engine status
+python3 tools/clawtrader.py engine
 
 # Verify installation
 python3 tools/clawtrader.py health
@@ -152,29 +151,27 @@ The log includes:
 ```
 1. 📊 Scanner finds opportunity (score 7+)
 2. 🛡️ Entry Validator checks conditions
-3. ✅ If all good → Execute buy on Binance
+3. ✅ If all good → Simulate or execute buy only when live trading is enabled
 4. 📈 Position Tracker monitors 24/7
-5. ⏰ SL or TP executes → Position closed
+5. ⏰ SL or TP is evaluated → Position closes only when live trading is enabled
 6. 📝 Journal logs the result
 7. 📊 Report sent to user via Telegram
 ```
 
 ---
 
-## 🌐 Web dashboard
+## ⚙️ Engine Status
 
-The web dashboard (port 8080) lets you view:
+The `engine` command lets you view:
 
 - Open positions
 - Trade history
-- Account balance
-- Recent scanner signals
-- Performance statistics
+- Internal monitor state
+- Trailing and SL/TP configuration
 
 ```bash
-# Start the dashboard
-python3 tools/clawtrader.py dashboard
-# Open: http://localhost:8080
+# View engine status
+python3 tools/clawtrader.py engine
 ```
 
 ---
@@ -182,8 +179,8 @@ python3 tools/clawtrader.py dashboard
 ## 🆘 Useful commands
 
 ```bash
-# Test Binance connection
-python3 tools/clawtrader.py snapshot --exchanges binance --symbols BTC/USDT
+# Check installation
+python3 tools/clawtrader.py health
 
 # Professional multi-timeframe scanner
 python3 tools/clawtrader.py pro-scan --symbols BTCUSDT ETHUSDT SOLUSDT
@@ -191,8 +188,8 @@ python3 tools/clawtrader.py pro-scan --symbols BTCUSDT ETHUSDT SOLUSDT
 # Professional plan for one asset
 python3 tools/clawtrader.py decide BTCUSDT
 
-# Quick analysis
-python3 tools/clawtrader.py analyze BTC-USD --period 5d --interval 1h
+# Analyze Smart Money
+python3 tools/clawtrader.py smart-money BTCUSDT
 
 # Validate a trade proposal
 python3 tools/clawtrader.py risk --entry 100 --current 101 --stop 97 --take-profit 106 --score 7 --amount 300

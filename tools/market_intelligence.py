@@ -222,6 +222,10 @@ def _score_components(frames, ticker):
     reasons = []
     warnings = []
 
+    data_errors = [tf for tf in TIMEFRAMES if "error" in frames.get(tf, {})]
+    if len(data_errors) == len(TIMEFRAMES):
+        return 0.0, reasons, ["market data unavailable for all timeframes"]
+
     regimes = {tf: frames.get(tf, {}).get("regime", "unknown") for tf in TIMEFRAMES}
     higher_up = regimes.get("4h", "").startswith("trend_up") and regimes.get("1d", "") in {
         "trend_up",
@@ -239,50 +243,60 @@ def _score_components(frames, ticker):
 
     one_h = frames.get("1h", {})
     fifteen = frames.get("15m", {})
-    if one_h.get("rsi", 50) < 30:
-        score += 7
-        reasons.append("1h RSI is oversold")
-    elif 45 <= one_h.get("rsi", 50) <= 65:
-        score += 8
-        reasons.append("1h RSI is in a constructive momentum band")
-    elif one_h.get("rsi", 50) > 75:
-        score -= 12
-        warnings.append("1h RSI is overextended")
-
-    if one_h.get("macd_hist", 0) > 0:
-        score += 6
-        reasons.append("1h MACD histogram is positive")
+    if "error" in one_h:
+        warnings.append("1h market data unavailable")
+        score -= 15
     else:
-        score -= 4
+        if one_h.get("rsi", 50) < 30:
+            score += 7
+            reasons.append("1h RSI is oversold")
+        elif 45 <= one_h.get("rsi", 50) <= 65:
+            score += 8
+            reasons.append("1h RSI is in a constructive momentum band")
+        elif one_h.get("rsi", 50) > 75:
+            score -= 12
+            warnings.append("1h RSI is overextended")
 
-    if fifteen.get("volume_ratio", 0) >= 1.15:
+        if one_h.get("macd_hist", 0) > 0:
+            score += 6
+            reasons.append("1h MACD histogram is positive")
+        else:
+            score -= 4
+
+        atr_pct = one_h.get("atr_pct", 0)
+        if 0.4 <= atr_pct <= 3.5:
+            score += 6
+            reasons.append("1h volatility is tradable")
+        elif atr_pct > 5:
+            score -= 12
+            warnings.append("1h volatility is elevated")
+
+        if 15 <= one_h.get("range_position_pct", 50) <= 70:
+            score += 6
+            reasons.append("price is not chasing the top of its 1h range")
+        elif one_h.get("range_position_pct", 50) > 85:
+            score -= 10
+            warnings.append("price is near the top of its recent 1h range")
+
+    if "error" in fifteen:
+        warnings.append("15m market data unavailable")
+        score -= 8
+    elif fifteen.get("volume_ratio", 0) >= 1.15:
         score += 5
         reasons.append("15m volume is above its 20-period average")
     elif fifteen.get("volume_ratio", 0) < 0.55:
         score -= 6
         warnings.append("15m volume is weak")
 
-    atr_pct = one_h.get("atr_pct", 0)
-    if 0.4 <= atr_pct <= 3.5:
-        score += 6
-        reasons.append("1h volatility is tradable")
-    elif atr_pct > 5:
-        score -= 12
-        warnings.append("1h volatility is elevated")
-
-    if ticker.get("quote_volume", 0) >= 5_000_000:
+    if ticker.get("error"):
+        warnings.append("24h ticker unavailable")
+        score -= 10
+    elif ticker.get("quote_volume", 0) >= 5_000_000:
         score += 5
         reasons.append("24h quote volume is liquid")
     else:
         score -= 8
         warnings.append("24h quote volume is thin")
-
-    if 15 <= one_h.get("range_position_pct", 50) <= 70:
-        score += 6
-        reasons.append("price is not chasing the top of its 1h range")
-    elif one_h.get("range_position_pct", 50) > 85:
-        score -= 10
-        warnings.append("price is near the top of its recent 1h range")
 
     return max(0, min(100, score)), reasons, warnings
 
@@ -334,6 +348,8 @@ def _build_plan(current, frames, filters, confidence):
 
 
 def _decision(score, validation, warnings):
+    if any("unavailable" in w for w in warnings):
+        return "DATA_ERROR"
     if score >= 72 and validation["approved"] and not any("bearish" in w for w in warnings):
         return "APPROVED_PAPER"
     if score >= 58:

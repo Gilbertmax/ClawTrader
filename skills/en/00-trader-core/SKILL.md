@@ -59,7 +59,6 @@ Clean trend. Exhausted trend. Operable range. Dirty range. High volatility. Low 
 - **Messy:** Entries without clarity.
 - **Dangerous:** Revenge, martingale, impulsivity.
 
-## Operational Lock (for Olymp Trade demo)
 Lock the trade if: No invalidation, no technical reason, chasing price, trying to recover a loss, user says "it's guaranteed", wants to double the amount, doesn't know where to exit, poor risk/reward, confusing chart.
 
 ## Model Usage Rules
